@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 845635858175049167}
   - component: {fileID: 845635858175049152}
   - component: {fileID: 845635858175049153}
-  - component: {fileID: 845635858175049154}
   - component: {fileID: 845635858175049165}
   m_Layer: 0
   m_Name: Snake
@@ -97,19 +96,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &845635858175049154
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 845635858175049155}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fed9283e553b62a4b9851fe4d13f9cd4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
 --- !u!114 &845635858175049165
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,3 +109,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   snakeSegment: {fileID: 0}
+  moveSpeed: 1
