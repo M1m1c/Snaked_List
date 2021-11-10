@@ -215,7 +215,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68637eb649ecfdf46969a2cf0f919692, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefab: {fileID: 845635858175049155, guid: 4d30ceacaec94ee48b7a25eb1c7d180b, type: 3}
+  snakePrefab: {fileID: 845635858175049165, guid: 4d30ceacaec94ee48b7a25eb1c7d180b, type: 3}
+  SpawnCoordinate: {x: 1, y: 1, z: 1}
 --- !u!1 &352883119
 GameObject:
   m_ObjectHideFlags: 0
