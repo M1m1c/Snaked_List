@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SnakeHead : SnakeSegment
 {
-    public SnakeSegment snakeSegment;
+    public SnakeSegment snakeSegmentPrefab;
 
     public bool isActive { get; set; } 
 
@@ -26,17 +26,20 @@ public class SnakeHead : SnakeSegment
 
     private int targetIndex = 0;
 
-    // Start is called before the first frame update
-    void Start()
-    {
 
-    }
-
-    public void Setup(Node startNode)
+    public override void Setup(Node startNode)
     {
-        CurrentNode = startNode;
+        base.Setup(startNode);
+        head = this;
+        tail = this;
+        for (int i = 0; i < 2; i++)
+        {
+            AddSnakeSegment();
+        }
         StartCoroutine(ActivationTimer());
     }
+
+   
 
     // Update is called once per frame
     void Update()
@@ -75,10 +78,9 @@ public class SnakeHead : SnakeSegment
 
         if (!IsMoving)
         {
-            IsMoving = true;
+            StartMoving(IncreaseTargetIndex);
             SetStepDirection(CurrentNode.volumeCoordinate, TargetNode.volumeCoordinate);
-            StopCoroutine(MoveToTarget(IncreaseTargetIndex));
-            StartCoroutine(MoveToTarget(IncreaseTargetIndex));
+            
         }
     }
 
@@ -89,8 +91,6 @@ public class SnakeHead : SnakeSegment
             path = newPath;
             targetIndex = 0;
             isWaitingForPath = false;
-            //StopCoroutine(MoveToTarget());
-            //StartCoroutine(MoveToTarget());
         }
         else
         {
@@ -108,13 +108,26 @@ public class SnakeHead : SnakeSegment
         isActive = true;
     }
 
+    private void AddSnakeSegment()
+    {
+        var tempSegment = Instantiate(snakeSegmentPrefab, CurrentNode.WorldPosition, Quaternion.identity);
+        tempSegment.Setup(CurrentNode);
+        tail.FollowingSegment = tempSegment;
+        tail = tempSegment;
+    }
+
+    private void IncreaseTargetIndex()
+    {
+        targetIndex++;
+    }
+
     private void SetStepDirection(Vector3Int currentCoord, Vector3Int newCoord)
     {
         stepDirection = new Vector3Int(
             GetStepValue(currentCoord.x, newCoord.x),
             GetStepValue(currentCoord.y, newCoord.y),
             GetStepValue(currentCoord.z, newCoord.z));
-    }
+    } 
 
     private int GetStepValue(int myAxisPos, int otherAxisPos)
     {
@@ -150,8 +163,5 @@ public class SnakeHead : SnakeSegment
             }
         }
     }
-    private void IncreaseTargetIndex()
-    {
-        targetIndex++;
-    }
+   
 }
