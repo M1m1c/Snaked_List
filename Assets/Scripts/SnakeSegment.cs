@@ -4,34 +4,37 @@ using System.Collections;
 using UnityEngine;
 public class SnakeSegment : MonoBehaviour
 {
-   
 
-    public bool isMoving { get; protected set; }
-    public Node targetNode { get; set; }
+
+    public bool IsMoving { get; protected set; }
+    public Node TargetNode { get; set; }
+    public Node CurrentNode { get; protected set; }
+
+    public SnakeSegment FollowingSegment { get; set; }
 
     [SerializeField] protected float moveSpeed = 1f;
-    protected Node currentNode = null;
 
-    protected int targetIndex = 0;
-
-    public IEnumerator MoveToTarget()
+    public IEnumerator MoveToTarget(Action arrivalAction)
     {
+       
+
         while (true)
         {
 
-            var dist = Vector3.Distance(transform.position, targetNode.WorldPosition);
+            var dist = Vector3.Distance(transform.position, TargetNode.WorldPosition);
             if (Mathf.Approximately(dist, 0f))
             {
-                targetIndex++;
-                currentNode = targetNode;
-                targetNode = null;
-                isMoving = false;
+                if (arrivalAction != null) { arrivalAction(); }
+
+                CurrentNode = TargetNode;
+                TargetNode = null;
+                IsMoving = false;
                 yield break;
             }
 
             transform.position = Vector3.MoveTowards(
                 transform.position,
-                targetNode.WorldPosition,
+                TargetNode.WorldPosition,
                 moveSpeed * Time.deltaTime);
 
             yield return null;

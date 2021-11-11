@@ -21,6 +21,11 @@ public class SnakeHead : SnakeSegment
 
     private bool isWaitingForPath = false;
 
+    private SnakeSegment head;
+    private SnakeSegment tail;
+
+    private int targetIndex = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,7 +34,7 @@ public class SnakeHead : SnakeSegment
 
     public void Setup(Node startNode)
     {
-        currentNode = startNode;
+        CurrentNode = startNode;
         StartCoroutine(ActivationTimer());
     }
 
@@ -44,9 +49,9 @@ public class SnakeHead : SnakeSegment
             PathRequestManager.RequestPath(transform.position, pathGoalNode.WorldPosition, OnPathFound);
             return;
         }
-        else if (targetIndex < path.Count && path.Count > 0)
+        else if (CurrentNode != pathGoalNode && path.Count > 0)
         {
-            targetNode = path[targetIndex];
+            TargetNode = path[targetIndex];
         }
         else if (pathGoalNode == null)
         {
@@ -54,7 +59,7 @@ public class SnakeHead : SnakeSegment
             pathGoalNode = NavVolume.NavVolumeInstance.GetRandomNode();
             return;
         }
-        else if (currentNode==pathGoalNode)  
+        else if (CurrentNode==pathGoalNode)  
         {
             pathGoalNode = null;
             path = new List<Node>();
@@ -62,18 +67,18 @@ public class SnakeHead : SnakeSegment
             return;
         }
 
-        if (targetNode == null)
+        if (TargetNode == null)
         {
-            targetNode = NavVolume.NavVolumeInstance.GetNodeFromIndex(currentNode.volumeCoordinate + stepDirection);
-            if (targetNode == null) { return; }
+            TargetNode = NavVolume.NavVolumeInstance.GetNodeFromIndex(CurrentNode.volumeCoordinate + stepDirection);
+            if (TargetNode == null) { return; }
         }
 
-        if (!isMoving)
+        if (!IsMoving)
         {
-            isMoving = true;
-            SetStepDirection(currentNode.volumeCoordinate, targetNode.volumeCoordinate);
-            StopCoroutine(MoveToTarget());
-            StartCoroutine(MoveToTarget());
+            IsMoving = true;
+            SetStepDirection(CurrentNode.volumeCoordinate, TargetNode.volumeCoordinate);
+            StopCoroutine(MoveToTarget(IncreaseTargetIndex));
+            StartCoroutine(MoveToTarget(IncreaseTargetIndex));
         }
     }
 
@@ -144,5 +149,9 @@ public class SnakeHead : SnakeSegment
                 }
             }
         }
+    }
+    private void IncreaseTargetIndex()
+    {
+        targetIndex++;
     }
 }
