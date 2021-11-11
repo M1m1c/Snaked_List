@@ -27,7 +27,7 @@ public class LinkedList<T> : IEnumerable
         public ListNode(T nodeVal, ListNode listNode)
         {
             nodeData = nodeVal;
-            _nextNode = listNode;
+            nextNode = listNode;
         }
 
         private T nodeData = default(T);
@@ -36,11 +36,11 @@ public class LinkedList<T> : IEnumerable
             get { return nodeData; }
         }
 
-        private ListNode _nextNode = null;
+        private ListNode nextNode = null;
         public ListNode NextNode
         {
-            get { return _nextNode; }
-            set { _nextNode = value; }
+            get { return nextNode; }
+            set { nextNode = value; }
         }
     }
 
