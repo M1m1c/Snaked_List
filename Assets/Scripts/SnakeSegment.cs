@@ -20,6 +20,12 @@ public class SnakeSegment : MonoBehaviour
         CurrentNode = startNode;
     }
 
+    public virtual void Setup(Node startNode, float speed)
+    {
+        CurrentNode = startNode;
+        moveSpeed = speed+1f;
+    }
+
 
     public void StartMoving(Action  arrivalAction)
     {
