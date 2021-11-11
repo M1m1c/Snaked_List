@@ -24,7 +24,7 @@ public class SnakeHead : SnakeSegment
     private SnakeSegment head;
     private SnakeSegment tail;
 
-    private int targetIndex = 0;
+    private int nextPathNodeIndex = 0;
 
 
     public override void Setup(Node startNode)
@@ -32,7 +32,7 @@ public class SnakeHead : SnakeSegment
         base.Setup(startNode);
         head = this;
         tail = this;
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 30; i++)
         {
             AddSnakeSegment();
         }
@@ -54,7 +54,7 @@ public class SnakeHead : SnakeSegment
         }
         else if (CurrentNode != pathGoalNode && path.Count > 0)
         {
-            TargetNode = path[targetIndex];
+            TargetNode = path[nextPathNodeIndex];
         }
         else if (pathGoalNode == null)
         {
@@ -66,7 +66,7 @@ public class SnakeHead : SnakeSegment
         {
             pathGoalNode = null;
             path = new List<Node>();
-            targetIndex = 0;
+            //nextPathNodeIndex = 0;
             return;
         }
 
@@ -89,7 +89,7 @@ public class SnakeHead : SnakeSegment
         if (pathSuccessful)
         {
             path = newPath;
-            targetIndex = 0;
+            nextPathNodeIndex = 0;
             isWaitingForPath = false;
         }
         else
@@ -111,14 +111,14 @@ public class SnakeHead : SnakeSegment
     private void AddSnakeSegment()
     {
         var tempSegment = Instantiate(snakeSegmentPrefab, CurrentNode.WorldPosition, Quaternion.identity);
-        tempSegment.Setup(CurrentNode);
+        tempSegment.Setup(CurrentNode,moveSpeed);
         tail.FollowingSegment = tempSegment;
         tail = tempSegment;
     }
 
     private void IncreaseTargetIndex()
     {
-        targetIndex++;
+        nextPathNodeIndex++;
     }
 
     private void SetStepDirection(Vector3Int currentCoord, Vector3Int newCoord)
@@ -147,12 +147,12 @@ public class SnakeHead : SnakeSegment
     {
         if (path != null)
         {
-            for (int i = targetIndex; i < path.Count; i++)
+            for (int i = nextPathNodeIndex; i < path.Count; i++)
             {
                 Gizmos.color = Color.black;
                 Gizmos.DrawCube(path[i].WorldPosition, new Vector3(.2f, .2f, .2f));
 
-                if (i == targetIndex)
+                if (i == nextPathNodeIndex)
                 {
                     Gizmos.DrawLine(transform.position, path[i].WorldPosition);
                 }
