@@ -14,11 +14,43 @@ public class SnakeSegment : MonoBehaviour
 
     [SerializeField] protected float moveSpeed = 1f;
 
+
+    public virtual void Setup(Node startNode)
+    {
+        CurrentNode = startNode;
+    }
+
+
+    public void StartMoving(Action  arrivalAction)
+    {
+        if (IsMoving) { return; }
+        IsMoving = true;
+        StopCoroutine(MoveToTarget(arrivalAction));
+        StartCoroutine(MoveToTarget(arrivalAction));
+
+        if (FollowingSegment)
+        {
+            if (CurrentNode != FollowingSegment.CurrentNode)
+            {
+                if (FollowingSegment.IsMoving == false)
+                {
+                    FollowingSegment.TargetNode = CurrentNode;
+                    FollowingSegment.StartMoving(null);
+                }
+            }
+        }
+    }
+
     public IEnumerator MoveToTarget(Action arrivalAction)
     {
-       
+        if (TargetNode == null)
+        {
+            //StopCoroutine(MoveToTarget(null));
+            IsMoving = false;
+            yield break;
+        }
 
-        while (true)
+        while (TargetNode != null)
         {
 
             var dist = Vector3.Distance(transform.position, TargetNode.WorldPosition);
@@ -38,7 +70,7 @@ public class SnakeSegment : MonoBehaviour
                 moveSpeed * Time.deltaTime);
 
             yield return null;
-        }
+        }        
     }
 
     //public IEnumerator MoveToNewNode(float speed, Action<SnakeSegment> callback)
