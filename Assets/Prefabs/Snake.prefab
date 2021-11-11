@@ -108,5 +108,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8059867fb4cfb36419980ffe240bcdff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1
+  moveSpeed: 2
   snakeSegmentPrefab: {fileID: 1286273593202614917, guid: a95f1a06099318847bca7fdbe4126bc3, type: 3}
