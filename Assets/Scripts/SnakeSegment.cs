@@ -47,11 +47,10 @@ public class SnakeSegment : MonoBehaviour
         }
     }
 
-    public IEnumerator MoveToTarget(Action arrivalAction)
+    protected IEnumerator MoveToTarget(Action arrivalAction)
     {
         if (TargetNode == null)
         {
-            //StopCoroutine(MoveToTarget(null));
             IsMoving = false;
             yield break;
         }
@@ -78,25 +77,4 @@ public class SnakeSegment : MonoBehaviour
             yield return null;
         }        
     }
-
-    //public IEnumerator MoveToNewNode(float speed, Action<SnakeSegment> callback)
-    //{
-    //    if (NewNode == null) { yield break; }
-    //    isMoving = true;
-    //    while (true)
-    //    {
-    //        var dist = Vector3.Distance(transform.position, NewNode.WorldPosition);
-    //        if (Mathf.Approximately(dist, 0f)) 
-    //        {
-    //            transform.position = NewNode.WorldPosition;
-    //            isMoving = false;
-    //            NewNode = null;
-    //            callback(this);
-    //           yield break;
-    //        }
-    //        transform.position = Vector3.MoveTowards(transform.position, NewNode.WorldPosition, speed * Time.deltaTime);
-    //        yield return null;
-    //    }
-    //}
-
 }
