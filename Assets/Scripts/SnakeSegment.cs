@@ -59,8 +59,8 @@ public class SnakeSegment : MonoBehaviour
         {
             if (nodeOccupationActions.Length < 2) { nodeOccupationActions = new Action[2]; }
 
-            nodeOccupationActions[0] = () => TargetNode.SetWalkable(false);
-            nodeOccupationActions[1] = () => CurrentNode.SetWalkable(true);
+            nodeOccupationActions[0] = () => TargetNode.ChangeWalkableState(false);
+            nodeOccupationActions[1] = () => CurrentNode.ChangeWalkableState(true);
         }
         else
         {
@@ -68,11 +68,11 @@ public class SnakeSegment : MonoBehaviour
 
             if (MySegmentType == SegmentType.Head)
             {
-                nodeOccupationActions[0] = () => TargetNode.SetWalkable(false);
+                nodeOccupationActions[0] = () => TargetNode.ChangeWalkableState(false);
             }
             else if (MySegmentType == SegmentType.Tail)
             {
-                nodeOccupationActions[0] = () => CurrentNode.SetWalkable(true);
+                nodeOccupationActions[0] = () => CurrentNode.ChangeWalkableState(true);
             }
             else
             {
