@@ -97,7 +97,7 @@ public class SnakeHead : SnakeSegment
     public void AddSnakeSegment()
     {
         var spawnNode = tail.CurrentNode;
-        var tempSegment = Instantiate(snakeSegmentPrefab, spawnNode.WorldPosition, Quaternion.identity);
+        var tempSegment = Instantiate(snakeSegmentPrefab, spawnNode.WorldPosition, Quaternion.identity,transform.parent);
         tempSegment.Setup(spawnNode, moveSpeed);
         tail.FollowingSegment = tempSegment;
         SetTail(tempSegment);
