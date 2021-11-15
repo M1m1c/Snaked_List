@@ -78,9 +78,9 @@ public class SnakeHead : SnakeSegment
 
         if (!IsMoving)
         {
-            StartMoving(IncreaseTargetIndex);
+            StartMoving();
             SetStepDirection(CurrentNode.volumeCoordinate, TargetNode.volumeCoordinate);
-            
+
         }
     }
 
