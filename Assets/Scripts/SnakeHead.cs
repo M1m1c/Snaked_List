@@ -40,6 +40,7 @@ public class SnakeHead : SnakeSegment
     private void Update()
     {
         if (!isActive) { return; }
+        if (IsMoving) { return; }
 
         //Move to next node in path
         if (CurrentNode != pathGoalNode && path.Count > 0)
@@ -72,11 +73,8 @@ public class SnakeHead : SnakeSegment
             if (TargetNode == null) { return; }
         }
 
-        if (!IsMoving)
-        {
-            StartMoving();
-            SetStepDirection(CurrentNode.volumeCoordinate, TargetNode.volumeCoordinate);
-        }
+        StartMoving();
+        SetStepDirection(CurrentNode.volumeCoordinate, TargetNode.volumeCoordinate);
     }
 
     public void OnPathFound(List<Node> newPath, bool pathSuccessful)
