@@ -7,7 +7,7 @@ public class SnakeHead : SnakeSegment
 {
     public SnakeSegment snakeSegmentPrefab;
 
-    public bool isActive { get; set; } 
+    public bool isActive { get; set; }
 
     //TODO make it so that snake cant walk in the opposite direction
     private Vector3Int stepDirection = new Vector3Int(1, 0, 0);
@@ -30,16 +30,21 @@ public class SnakeHead : SnakeSegment
     public override void Setup(Node startNode)
     {
         base.Setup(startNode);
-        head = this;
-        tail = this;
+        SetHead(this);
+        SetTail(this);
+
         for (int i = 0; i < 30; i++)
         {
             AddSnakeSegment();
         }
+
+        arrivalActions = new List<System.Action>();
+        arrivalActions.Add(IncreaseTargetIndex);
+
         StartCoroutine(ActivationTimer());
     }
 
-   
+
 
     // Update is called once per frame
     void Update()
@@ -62,7 +67,7 @@ public class SnakeHead : SnakeSegment
             pathGoalNode = NavVolume.NavVolumeInstance.GetRandomNode();
             return;
         }
-        else if (CurrentNode==pathGoalNode)  
+        else if (CurrentNode == pathGoalNode)
         {
             pathGoalNode = null;
             path = new List<Node>();
@@ -111,9 +116,9 @@ public class SnakeHead : SnakeSegment
     private void AddSnakeSegment()
     {
         var tempSegment = Instantiate(snakeSegmentPrefab, CurrentNode.WorldPosition, Quaternion.identity);
-        tempSegment.Setup(CurrentNode,moveSpeed);
+        tempSegment.Setup(CurrentNode, moveSpeed);
         tail.FollowingSegment = tempSegment;
-        tail = tempSegment;
+        SetTail(tempSegment);
     }
 
     private void IncreaseTargetIndex()
@@ -127,7 +132,7 @@ public class SnakeHead : SnakeSegment
             GetStepValue(currentCoord.x, newCoord.x),
             GetStepValue(currentCoord.y, newCoord.y),
             GetStepValue(currentCoord.z, newCoord.z));
-    } 
+    }
 
     private int GetStepValue(int myAxisPos, int otherAxisPos)
     {
@@ -141,6 +146,20 @@ public class SnakeHead : SnakeSegment
             stepSize = 1;
         }
         return stepSize;
+    }
+
+    private void SetHead(SnakeSegment segmentToUse)
+    {
+        if (head) { head.MySegmentType &= ~SegmentType.Head; }
+        segmentToUse.MySegmentType |= SegmentType.Head;
+        head = segmentToUse;
+    }
+
+    private void SetTail(SnakeSegment segmentToUse)
+    {
+        if (tail) { tail.MySegmentType &= ~SegmentType.Tail; }
+        segmentToUse.MySegmentType |= SegmentType.Tail;
+        tail = segmentToUse;
     }
 
     public void OnDrawGizmos()
@@ -163,5 +182,5 @@ public class SnakeHead : SnakeSegment
             }
         }
     }
-   
+
 }
