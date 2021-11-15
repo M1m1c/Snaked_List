@@ -102,6 +102,26 @@ public class SnakeHead : SnakeSegment
         }
     }
 
+    public void AddSnakeSegment()
+    {
+        var spawnNode = tail.CurrentNode;
+        var tempSegment = Instantiate(snakeSegmentPrefab, spawnNode.WorldPosition, Quaternion.identity);
+        tempSegment.Setup(spawnNode, moveSpeed);
+        tail.FollowingSegment = tempSegment;
+        SetTail(tempSegment);
+    }
+
+    private bool CheckForQueuedGoal()
+    {
+        var retval = false;
+        if (queuedGoalNode != null)
+        {
+            pathGoalNode = queuedGoalNode;
+            queuedGoalNode = null;
+            retval = true;
+        }
+        return retval;
+    }
     private IEnumerator ActivationTimer()
     {
         yield return new WaitForSeconds(1f);
@@ -109,15 +129,12 @@ public class SnakeHead : SnakeSegment
         isActive = true;
     }
 
-    private void AddSnakeSegment()
+    private void QueueFruitNodeAsGoal(Node fruitNode)
     {
-        var tempSegment = Instantiate(snakeSegmentPrefab, CurrentNode.WorldPosition, Quaternion.identity);
-        tempSegment.Setup(CurrentNode, moveSpeed);
-        tail.FollowingSegment = tempSegment;
-        SetTail(tempSegment);
+        queuedGoalNode = fruitNode;
     }
 
-    private void IncreaseTargetIndex()
+    private void IncreasePathNodeIndex()
     {
         nextPathNodeIndex++;
     }
