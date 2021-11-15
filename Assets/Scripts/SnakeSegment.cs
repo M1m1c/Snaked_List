@@ -33,31 +33,55 @@ public class SnakeSegment : MonoBehaviour
     public virtual void Setup(Node startNode, float speed)
     {
         CurrentNode = startNode;
-        moveSpeed = speed+1f;
+        moveSpeed = speed + 1f;
     }
 
-
-    public void StartMoving(Action  arrivalAction)
+    public void StartMoving()
     {
         if (IsMoving) { return; }
         IsMoving = true;
-        StopCoroutine(MoveToTarget(arrivalAction));
-        StartCoroutine(MoveToTarget(arrivalAction));
 
-        if (FollowingSegment)
+        StopCoroutine(MoveToTarget(nodeOccupationActions));
+
+        DetemineNodeOccupationActions();
+
+        StartCoroutine(MoveToTarget(nodeOccupationActions));
+
+        StartMovingFollowingSegment();
+    }  
+
+
+    private void DetemineNodeOccupationActions()
+    {
+        if (MySegmentType == SegmentType.None && nodeOccupationActions.Length == 0) { return; }
+
+        if (MySegmentType.HasFlag(SegmentType.Head) && MySegmentType.HasFlag(SegmentType.Tail))
         {
-            if (CurrentNode != FollowingSegment.CurrentNode)
+            if (nodeOccupationActions.Length < 2) { nodeOccupationActions = new Action[2]; }
+
+            nodeOccupationActions[0] = () => TargetNode.SetWalkable(false);
+            nodeOccupationActions[1] = () => CurrentNode.SetWalkable(true);
+        }
+        else
+        {
+            if (nodeOccupationActions.Length > 1) { nodeOccupationActions = new Action[1]; }
+
+            if (MySegmentType == SegmentType.Head)
             {
-                if (FollowingSegment.IsMoving == false)
-                {
-                    FollowingSegment.TargetNode = CurrentNode;
-                    FollowingSegment.StartMoving(null);
-                }
+                nodeOccupationActions[0] = () => TargetNode.SetWalkable(false);
+            }
+            else if (MySegmentType == SegmentType.Tail)
+            {
+                nodeOccupationActions[0] = () => CurrentNode.SetWalkable(true);
+            }
+            else
+            {
+                nodeOccupationActions = new Action[0];
             }
         }
     }
 
-    protected IEnumerator MoveToTarget(Action arrivalAction)
+    protected IEnumerator MoveToTarget(Action[] actionsToCall)
     {
         if (TargetNode == null)
         {
@@ -99,6 +123,22 @@ public class SnakeSegment : MonoBehaviour
                 moveSpeed * Time.deltaTime);
 
             yield return null;
-        }        
+        }
+    }
+
+    private void StartMovingFollowingSegment()
+    {
+        if (FollowingSegment)
+        {
+            if (CurrentNode != FollowingSegment.CurrentNode)
+            {
+                if (FollowingSegment.IsMoving == false)
+                {
+                    FollowingSegment.TargetNode = CurrentNode;
+
+                    FollowingSegment.StartMoving();
+                }
+            }
+        }
     }
 }
