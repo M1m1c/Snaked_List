@@ -29,47 +29,42 @@ public class SnakeHead : SnakeSegment
         SetHead(this);
         SetTail(this);
 
-        for (int i = 0; i < 30; i++)
-        {
-            AddSnakeSegment();
-        }
-
         arrivalActions = new List<System.Action>();
-        arrivalActions.Add(IncreaseTargetIndex);
+        arrivalActions.Add(IncreasePathNodeIndex);
+
+        FruitSpawner.FruitSpawnEvent.AddListener(QueueFruitNodeAsGoal);
 
         StartCoroutine(ActivationTimer());
     }
 
-
-
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (!isActive) { return; }
 
-        if (path.Count == 0 && pathGoalNode != null && isWaitingForPath == false)
-        {
-            isWaitingForPath = true;
-            PathRequestManager.RequestPath(transform.position, pathGoalNode.WorldPosition, OnPathFound);
-            return;
-        }
-        else if (CurrentNode != pathGoalNode && path.Count > 0)
+        //Move to next node in path
+        if (CurrentNode != pathGoalNode && path.Count > 0)
         {
             TargetNode = path[nextPathNodeIndex];
         }
-        else if (pathGoalNode == null)
+        else
         {
-            //TODO get a node that we should move to
-            pathGoalNode = NavVolume.NavVolumeInstance.GetRandomNode();
+            if (path.Count == 0 && pathGoalNode != null && isWaitingForPath == false)
+            {
+                isWaitingForPath = true;
+                PathRequestManager.RequestPath(transform.position, pathGoalNode.WorldPosition, OnPathFound);
+            }
+            else if (CurrentNode == pathGoalNode || pathGoalNode == null)
+            {
+                path = new List<Node>();
+
+                if (!CheckForQueuedGoal())
+                {
+                    pathGoalNode = NavVolume.NavVolumeInstance.GetRandomNode();
+                }
+            }
             return;
         }
-        else if (CurrentNode == pathGoalNode)
-        {
-            pathGoalNode = null;
-            path = new List<Node>();
-            //nextPathNodeIndex = 0;
-            return;
-        }
+
 
         if (TargetNode == null)
         {
@@ -81,7 +76,6 @@ public class SnakeHead : SnakeSegment
         {
             StartMoving();
             SetStepDirection(CurrentNode.volumeCoordinate, TargetNode.volumeCoordinate);
-
         }
     }
 
