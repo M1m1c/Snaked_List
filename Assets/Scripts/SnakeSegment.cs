@@ -1,19 +1,29 @@
 ﻿using m1m1c_3DAstarPathfinding;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 public class SnakeSegment : MonoBehaviour
 {
 
-
     public bool IsMoving { get; protected set; }
     public Node TargetNode { get; set; }
     public Node CurrentNode { get; protected set; }
-
+    public SegmentType MySegmentType { get; set; }
     public SnakeSegment FollowingSegment { get; set; }
+
+    protected Action[] nodeOccupationActions = new Action[2];
+
+    protected List<Action> arrivalActions;
 
     [SerializeField] protected float moveSpeed = 1f;
 
+    public enum SegmentType
+    {
+        None,
+        Head,
+        Tail
+    }
 
     public virtual void Setup(Node startNode)
     {
@@ -61,7 +71,21 @@ public class SnakeSegment : MonoBehaviour
             var dist = Vector3.Distance(transform.position, TargetNode.WorldPosition);
             if (Mathf.Approximately(dist, 0f))
             {
-                if (arrivalAction != null) { arrivalAction(); }
+                if (actionsToCall != null && actionsToCall.Length > 0)
+                {
+                    foreach (var action in actionsToCall)
+                    {
+                        if (action != null) { action(); }
+                    }
+                }
+
+                if(arrivalActions!=null && arrivalActions.Count > 0)
+                {
+                    foreach (var action in arrivalActions)
+                    {
+                        if (action != null) { action(); }
+                    }
+                }
 
                 CurrentNode = TargetNode;
                 TargetNode = null;
