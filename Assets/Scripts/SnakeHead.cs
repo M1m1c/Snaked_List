@@ -6,18 +6,14 @@ using UnityEngine;
 public class SnakeHead : SnakeSegment
 {
     public SnakeSegment snakeSegmentPrefab;
-
     public bool isActive { get; set; }
 
-    //TODO make it so that snake cant walk in the opposite direction
     private Vector3Int stepDirection = new Vector3Int(1, 0, 0);
 
     private Node pathGoalNode;
+    private Node queuedGoalNode;
 
-    //TODO maybe instead of the head having a linked list of all segments, each segment has reference to the one behind it,
-    // and head only knows about the tail for adding extra segments
     private List<Node> path = new List<Node>();
-    private LinkedList<SnakeSegment> segments = new LinkedList<SnakeSegment>();
 
     private bool isWaitingForPath = false;
 
