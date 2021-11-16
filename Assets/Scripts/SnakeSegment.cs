@@ -8,6 +8,7 @@ public class SnakeSegment : MonoBehaviour
 
     public bool IsMoving { get; protected set; }
     public Node TargetNode { get; set; }
+    public Node FollowingNode { get; set; }
     public Node CurrentNode { get; protected set; }
     public SegmentType MySegmentType { get; set; }
     public SnakeSegment FollowingSegment { get; set; }
@@ -67,22 +68,26 @@ public class SnakeSegment : MonoBehaviour
 
         if (MySegmentType.HasFlag(SegmentType.Head) && MySegmentType.HasFlag(SegmentType.Tail))
         {
-            if (nodeOccupationActions.Length < 2) { nodeOccupationActions = new Action[2]; }
+            if (nodeOccupationActions.Length < 4) { nodeOccupationActions = new Action[4]; }
 
             nodeOccupationActions[0] = () => TargetNode.ChangeWalkableState(false);
             nodeOccupationActions[1] = () => CurrentNode.ChangeWalkableState(true);
+            nodeOccupationActions[2] = () => TargetNode.ChangeAdjacentWalkPenaltyExludingFollowing(10,FollowingNode);
+            nodeOccupationActions[3] = () => CurrentNode.ChangeAdjacentWalkPenaltyExludingFollowing(-10, null);
         }
         else
         {
-            if (nodeOccupationActions.Length > 1) { nodeOccupationActions = new Action[1]; }
+            if (nodeOccupationActions.Length > 2) { nodeOccupationActions = new Action[2]; }
 
             if (MySegmentType == SegmentType.Head)
             {
                 nodeOccupationActions[0] = () => TargetNode.ChangeWalkableState(false);
+                nodeOccupationActions[1] = () => TargetNode.ChangeAdjacentWalkPenaltyExludingFollowing(10,FollowingNode);
             }
             else if (MySegmentType == SegmentType.Tail)
             {
                 nodeOccupationActions[0] = () => CurrentNode.ChangeWalkableState(true);
+                nodeOccupationActions[1] = () => CurrentNode.ChangeAdjacentWalkPenaltyExludingFollowing(-10, null);
             }
             else
             {
