@@ -32,7 +32,7 @@ public class SnakeHead : SnakeSegment
         arrivalActions = new List<System.Action>();
         arrivalActions.Add(IncreasePathNodeIndex);
 
-        FruitSpawner.FruitSpawnEvent.AddListener(QueueFruitNodeAsGoal);
+        FruitSpawner.FruitSpawnEvent.AddListener(ChangePath);
 
         StartCoroutine(ActivationTimer());
     }
@@ -136,6 +136,16 @@ public class SnakeHead : SnakeSegment
     private void QueueFruitNodeAsGoal(Node fruitNode)
     {
         queuedGoalNode = fruitNode;
+    }
+
+    private void ChangePath(Node newFruitNode)
+    {
+        StopCoroutine(MoveToTarget(nodeOccupationActions));
+        QueueFruitNodeAsGoal(newFruitNode);
+
+        path = new List<Node>();
+        pathGoalNode = null;
+        isWaitingForPath = false;
     }
 
     private void IncreasePathNodeIndex()
