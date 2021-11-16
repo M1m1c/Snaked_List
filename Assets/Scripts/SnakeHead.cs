@@ -47,6 +47,13 @@ public class SnakeHead : SnakeSegment
         if (CurrentNode != pathGoalNode && path.Count > 0)
         {
             TargetNode = path[nextPathNodeIndex];
+
+            var followUpIndex = nextPathNodeIndex + 1;
+            if (followUpIndex < path.Count) 
+            { FollowingNode = path[followUpIndex]; }
+            else 
+            { FollowingNode = null; }
+
         }
         else
         {
@@ -105,7 +112,7 @@ public class SnakeHead : SnakeSegment
     {
         var spawnNode = tail.CurrentNode;
         spawnNode.ChangeWalkableState(false);
-        var tempSegment = Instantiate(snakeSegmentPrefab, spawnNode.WorldPosition, Quaternion.identity,transform.parent);
+        var tempSegment = Instantiate(snakeSegmentPrefab, spawnNode.WorldPosition, Quaternion.identity, transform.parent);
         tempSegment.Setup(spawnNode, moveSpeed);
         tail.FollowingSegment = tempSegment;
         SetTail(tempSegment);
@@ -161,16 +168,16 @@ public class SnakeHead : SnakeSegment
 
     private void StopListeningToInbetweenNodes()
     {
-        if (CurrentNode != null) 
+        if (CurrentNode != null)
         {
             CurrentNode.NodeWalkableDisabled.RemoveListener(this.UpdatePath);
         }
 
-        if(TargetNode != null)
+        if (TargetNode != null)
         {
             TargetNode.NodeWalkableDisabled.RemoveListener(this.UpdatePath);
         }
-        
+
     }
 
     private void ClearPath()
@@ -179,7 +186,7 @@ public class SnakeHead : SnakeSegment
         {
             node.NodeWalkableDisabled.RemoveListener(this.UpdatePath);
         }
-        path = new List<Node>();    
+        path = new List<Node>();
     }
 
     private void IncreasePathNodeIndex()
