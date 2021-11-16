@@ -11,7 +11,7 @@ public class FruitSpawner : MonoBehaviour
 
     private NavVolume navVolume;
 
-    private bool canSpawnFruit = true;
+    private FruitPickup fruitInstance;
 
     private void Start()
     {
@@ -27,8 +27,7 @@ public class FruitSpawner : MonoBehaviour
 
     private void SpawnFruit()
     {
-        if (!canSpawnFruit) { return; }
-        canSpawnFruit = false;
+        if (fruitInstance != null && fruitInstance.pendingDestruction == false) { return; }
 
         Node spawnNode;
         while (true)
@@ -42,8 +41,8 @@ public class FruitSpawner : MonoBehaviour
 
         var tempRef = Instantiate(FruitPrefab, spawnNode.WorldPosition, Quaternion.identity);
         tempRef.FruitEatenEvent.AddListener(SpawnFruit);
+        fruitInstance = tempRef;
         FruitSpawnEvent.Invoke(spawnNode);
-        canSpawnFruit = true;
     }
 
 }

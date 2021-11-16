@@ -5,6 +5,7 @@ public class FruitPickup : MonoBehaviour
 {
     public UnityEvent FruitEatenEvent = new UnityEvent();
 
+    public bool pendingDestruction = false;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -12,6 +13,7 @@ public class FruitPickup : MonoBehaviour
         if (snakeHead)
         {
             snakeHead.AddSnakeSegment();
+            pendingDestruction = true;
             FruitEatenEvent.Invoke();
             Destroy(gameObject);
         }
