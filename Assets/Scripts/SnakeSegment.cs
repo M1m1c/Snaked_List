@@ -99,19 +99,18 @@ public class SnakeSegment : MonoBehaviour
             yield break;
         }
 
+        transform.LookAt(TargetNode.WorldPosition,Vector3.up);
+
         while (TargetNode != null)
         {
 
             var dist = Vector3.Distance(transform.position, TargetNode.WorldPosition);
             if (Mathf.Approximately(dist, 0f))
             {
-                if (occupationActionsToCall != null && occupationActionsToCall.Length > 0)
-                {
-                    foreach (var action in occupationActionsToCall)
-                    {
-                        if (action != null) { action(); }
-                    }
-                }
+
+                //TODO update the walk penalty in adjacent nodes when a segment is next to them,
+                //check when moving if the walk penalty has increased when moving toa new node, change path if it has, 
+                //because that means there is a snake nearby.
 
                 if (arrivalActions != null && arrivalActions.Count > 0)
                 {
@@ -120,6 +119,16 @@ public class SnakeSegment : MonoBehaviour
                         if (action != null) { action(); }
                     }
                 }
+
+                if (occupationActionsToCall != null && occupationActionsToCall.Length > 0)
+                {
+                    foreach (var action in occupationActionsToCall)
+                    {
+                        if (action != null) { action(); }
+                    }
+                }
+
+                
 
                 CurrentNode = TargetNode;
                 TargetNode = null;
