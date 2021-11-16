@@ -14,6 +14,7 @@ public class SnakeHead : SnakeSegment
     private Node queuedGoalNode;
 
     private List<Node> path = new List<Node>();
+    private List<int> savedWalkPenalties = new List<int>();
 
     private bool isWaitingForPath = false;
 
@@ -45,14 +46,24 @@ public class SnakeHead : SnakeSegment
 
         //Move to next node in path
         if (CurrentNode != pathGoalNode && path.Count > 0)
-        {
-            TargetNode = path[nextPathNodeIndex];
+        {      
+
+            TargetNode = path[nextPathNodeIndex];        
 
             var followUpIndex = nextPathNodeIndex + 1;
             if (followUpIndex < path.Count) 
             { FollowingNode = path[followUpIndex]; }
             else 
             { FollowingNode = null; }
+
+            if (savedWalkPenalties.Count > 0)
+            {
+                var savedWalkPenalty = savedWalkPenalties[nextPathNodeIndex];
+                if (TargetNode.WalkPenalty > savedWalkPenalty)
+                {
+                    UpdatePath();
+                }
+            }
 
         }
         else
@@ -90,10 +101,12 @@ public class SnakeHead : SnakeSegment
         if (pathSuccessful)
         {
             path = newPath;
+            savedWalkPenalties = new List<int>();
 
             foreach (var node in path)
             {
                 node.NodeWalkableDisabled.AddListener(this.UpdatePath);
+                savedWalkPenalties.Add(node.WalkPenalty);
             }
 
             nextPathNodeIndex = 0;
@@ -142,6 +155,7 @@ public class SnakeHead : SnakeSegment
         if (other.CompareTag("Fruit")) { return; }
 
         isActive = false;
+        ResetWalkPenaltyInAdjacent();
         DisableSegment();
         Destroy(transform.parent.gameObject);
 
@@ -153,7 +167,7 @@ public class SnakeHead : SnakeSegment
     }
 
     private void UpdatePath()
-    {
+    {      
         ChangePath(queuedGoalNode);
     }
 
