@@ -30,6 +30,7 @@ public class SnakeHead : SnakeSegment
         SetTail(this);
 
         arrivalActions = new List<System.Action>();
+        arrivalActions.Add(StopListeningToInbetweenNodes);
         arrivalActions.Add(IncreasePathNodeIndex);
 
         FruitSpawner.FruitSpawnEvent.AddListener(ChangePath);
@@ -56,7 +57,7 @@ public class SnakeHead : SnakeSegment
             }
             else if (CurrentNode == pathGoalNode || pathGoalNode == null)
             {
-                path = new List<Node>();
+                ClearPath();
 
                 if (!CheckForQueuedGoal())
                 {
@@ -82,6 +83,12 @@ public class SnakeHead : SnakeSegment
         if (pathSuccessful)
         {
             path = newPath;
+
+            foreach (var node in path)
+            {
+                node.NodeWalkableDisabled.AddListener(this.UpdatePath);
+            }
+
             nextPathNodeIndex = 0;
             isWaitingForPath = false;
         }
@@ -97,6 +104,7 @@ public class SnakeHead : SnakeSegment
     public void AddSnakeSegment()
     {
         var spawnNode = tail.CurrentNode;
+        spawnNode.ChangeWalkableState(false);
         var tempSegment = Instantiate(snakeSegmentPrefab, spawnNode.WorldPosition, Quaternion.identity,transform.parent);
         tempSegment.Setup(spawnNode, moveSpeed);
         tail.FollowingSegment = tempSegment;
@@ -109,7 +117,6 @@ public class SnakeHead : SnakeSegment
         if (queuedGoalNode != null)
         {
             pathGoalNode = queuedGoalNode;
-            queuedGoalNode = null;
             retval = true;
         }
         return retval;
