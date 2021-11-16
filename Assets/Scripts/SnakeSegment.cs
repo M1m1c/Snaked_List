@@ -18,6 +18,7 @@ public class SnakeSegment : MonoBehaviour
     protected List<Action> arrivalActions;
 
     [SerializeField] protected float moveSpeed = 1f;
+    [SerializeField] protected int walkPenaltyNearBody = 10;
 
     public enum SegmentType
     {
@@ -42,9 +43,25 @@ public class SnakeSegment : MonoBehaviour
         StopCoroutine(MoveToTarget(nodeOccupationActions));
 
         if (CurrentNode != null) { CurrentNode.ChangeWalkableState(true); }
+
         if (TargetNode != null) { TargetNode.ChangeWalkableState(true); }
 
         if (FollowingSegment) { FollowingSegment.DisableSegment(); }
+    }
+
+    public void ResetWalkPenaltyInAdjacent()
+    {
+        if (CurrentNode != null)
+        {
+            CurrentNode.WalkPenalty = 0;
+        }
+
+        if (TargetNode != null)
+        {
+            TargetNode.WalkPenalty = 0;
+        }
+
+        if (FollowingSegment) { FollowingSegment.ResetWalkPenaltyInAdjacent(); }
     }
 
     public void StartMoving()
@@ -72,8 +89,11 @@ public class SnakeSegment : MonoBehaviour
 
             nodeOccupationActions[0] = () => TargetNode.ChangeWalkableState(false);
             nodeOccupationActions[1] = () => CurrentNode.ChangeWalkableState(true);
-            nodeOccupationActions[2] = () => TargetNode.ChangeAdjacentWalkPenaltyExludingFollowing(10,FollowingNode);
-            nodeOccupationActions[3] = () => CurrentNode.ChangeAdjacentWalkPenaltyExludingFollowing(-10, null);
+
+            nodeOccupationActions[2] = () =>
+            TargetNode.ChangeAdjacentWalkPenaltyExludingFollowing(walkPenaltyNearBody, FollowingNode);
+            nodeOccupationActions[3] = () =>
+            CurrentNode.ChangeAdjacentWalkPenaltyExludingFollowing(-walkPenaltyNearBody, null);
         }
         else
         {
@@ -82,12 +102,14 @@ public class SnakeSegment : MonoBehaviour
             if (MySegmentType == SegmentType.Head)
             {
                 nodeOccupationActions[0] = () => TargetNode.ChangeWalkableState(false);
-                nodeOccupationActions[1] = () => TargetNode.ChangeAdjacentWalkPenaltyExludingFollowing(10,FollowingNode);
+                nodeOccupationActions[1] = () =>
+                TargetNode.ChangeAdjacentWalkPenaltyExludingFollowing(walkPenaltyNearBody, FollowingNode);
             }
             else if (MySegmentType == SegmentType.Tail)
             {
                 nodeOccupationActions[0] = () => CurrentNode.ChangeWalkableState(true);
-                nodeOccupationActions[1] = () => CurrentNode.ChangeAdjacentWalkPenaltyExludingFollowing(-10, null);
+                nodeOccupationActions[1] = () =>
+                CurrentNode.ChangeAdjacentWalkPenaltyExludingFollowing(-walkPenaltyNearBody, null);
             }
             else
             {
@@ -104,7 +126,7 @@ public class SnakeSegment : MonoBehaviour
             yield break;
         }
 
-        transform.LookAt(TargetNode.WorldPosition,Vector3.up);
+        transform.LookAt(TargetNode.WorldPosition, Vector3.up);
 
         while (TargetNode != null)
         {
@@ -133,7 +155,7 @@ public class SnakeSegment : MonoBehaviour
                     }
                 }
 
-                
+
 
                 CurrentNode = TargetNode;
                 TargetNode = null;
