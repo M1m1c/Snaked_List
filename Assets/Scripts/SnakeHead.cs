@@ -121,6 +121,18 @@ public class SnakeHead : SnakeSegment
         isActive = true;
     }
 
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject == FollowingSegment) { return; }
+        if (other.CompareTag("Fruit")) { return; }
+
+        isActive = false;
+        DisableSegment();
+        Destroy(transform.parent.gameObject);
+
+    }
+
     private void QueueFruitNodeAsGoal(Node fruitNode)
     {
         queuedGoalNode = fruitNode;
