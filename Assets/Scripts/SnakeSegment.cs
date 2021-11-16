@@ -36,6 +36,16 @@ public class SnakeSegment : MonoBehaviour
         moveSpeed = speed + 1f;
     }
 
+    public void DisableSegment()
+    {
+        StopCoroutine(MoveToTarget(nodeOccupationActions));
+
+        if (CurrentNode != null) { CurrentNode.ChangeWalkableState(true); }
+        if (TargetNode != null) { TargetNode.ChangeWalkableState(true); }
+
+        if (FollowingSegment) { FollowingSegment.DisableSegment(); }
+    }
+
     public void StartMoving()
     {
         if (IsMoving) { return; }
@@ -48,7 +58,7 @@ public class SnakeSegment : MonoBehaviour
         StartCoroutine(MoveToTarget(nodeOccupationActions));
 
         StartMovingFollowingSegment();
-    }  
+    }
 
 
     private void DetemineNodeOccupationActions()
@@ -81,7 +91,7 @@ public class SnakeSegment : MonoBehaviour
         }
     }
 
-    protected IEnumerator MoveToTarget(Action[] actionsToCall)
+    protected IEnumerator MoveToTarget(Action[] occupationActionsToCall)
     {
         if (TargetNode == null)
         {
@@ -95,15 +105,15 @@ public class SnakeSegment : MonoBehaviour
             var dist = Vector3.Distance(transform.position, TargetNode.WorldPosition);
             if (Mathf.Approximately(dist, 0f))
             {
-                if (actionsToCall != null && actionsToCall.Length > 0)
+                if (occupationActionsToCall != null && occupationActionsToCall.Length > 0)
                 {
-                    foreach (var action in actionsToCall)
+                    foreach (var action in occupationActionsToCall)
                     {
                         if (action != null) { action(); }
                     }
                 }
 
-                if(arrivalActions!=null && arrivalActions.Count > 0)
+                if (arrivalActions != null && arrivalActions.Count > 0)
                 {
                     foreach (var action in arrivalActions)
                     {
