@@ -138,14 +138,41 @@ public class SnakeHead : SnakeSegment
         queuedGoalNode = fruitNode;
     }
 
+    private void UpdatePath()
+    {
+        ChangePath(queuedGoalNode);
+    }
+
     private void ChangePath(Node newFruitNode)
     {
         StopCoroutine(MoveToTarget(nodeOccupationActions));
         QueueFruitNodeAsGoal(newFruitNode);
-
-        path = new List<Node>();
+        ClearPath();
         pathGoalNode = null;
         isWaitingForPath = false;
+    }
+
+    private void StopListeningToInbetweenNodes()
+    {
+        if (CurrentNode != null) 
+        {
+            CurrentNode.NodeWalkableDisabled.RemoveListener(this.UpdatePath);
+        }
+
+        if(TargetNode != null)
+        {
+            TargetNode.NodeWalkableDisabled.RemoveListener(this.UpdatePath);
+        }
+        
+    }
+
+    private void ClearPath()
+    {
+        foreach (var node in path)
+        {
+            node.NodeWalkableDisabled.RemoveListener(this.UpdatePath);
+        }
+        path = new List<Node>();    
     }
 
     private void IncreasePathNodeIndex()
