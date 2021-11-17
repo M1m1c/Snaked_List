@@ -37,7 +37,10 @@ public class SnakeHead : SnakeSegment
         SetHead(this);
         SetTail(this);
 
-        
+        for (int i = 0; i < StartingSegments; i++)
+        {
+            AddSnakeSegment();
+        }
 
         arrivalActions = new List<System.Action>();
         arrivalActions.Add(StopListeningToInbetweenNodes);
@@ -153,8 +156,15 @@ public class SnakeHead : SnakeSegment
     private IEnumerator ActivationTimer()
     {
         yield return new WaitForSeconds(1f);
-
+        StartCoroutine(ActivateCollider());
         isActive = true;
+    }
+
+    private IEnumerator ActivateCollider()
+    {
+        yield return new WaitForSeconds(0.5f);
+        var col=GetComponent<Collider>();
+        col.enabled = true;
     }
 
 
