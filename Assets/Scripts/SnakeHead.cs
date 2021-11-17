@@ -151,6 +151,15 @@ public class SnakeHead : SnakeSegment
         SetTail(tempSegment);
     }
 
+    public void KillSnake()
+    {
+        isActive = false;
+        ResetWalkPenaltyInAdjacent();
+        DisableSegment();
+        SnakeDeathEvent.Invoke(startNode);
+        Destroy(transform.parent.gameObject);
+    }
+
     private bool CheckForQueuedGoal()
     {
         var retval = false;
@@ -175,17 +184,12 @@ public class SnakeHead : SnakeSegment
         col.enabled = true;
     }
 
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == FollowingSegment) { return; }
         if (other.CompareTag("Fruit")) { return; }
 
-        isActive = false;
-        ResetWalkPenaltyInAdjacent();
-        DisableSegment();
-        SnakeDeathEvent.Invoke(startNode);
-        Destroy(transform.parent.gameObject);
+        KillSnake();
 
     }
 
