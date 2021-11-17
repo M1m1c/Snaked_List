@@ -135,10 +135,6 @@ public class SnakeSegment : MonoBehaviour
             if (Mathf.Approximately(dist, 0f))
             {
 
-                //TODO update the walk penalty in adjacent nodes when a segment is next to them,
-                //check when moving if the walk penalty has increased when moving toa new node, change path if it has, 
-                //because that means there is a snake nearby.
-
                 if (arrivalActions != null && arrivalActions.Count > 0)
                 {
                     foreach (var action in arrivalActions)
