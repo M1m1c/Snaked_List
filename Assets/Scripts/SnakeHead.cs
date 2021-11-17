@@ -13,6 +13,8 @@ public class SnakeHead : SnakeSegment
 
     public int SnakeIndex { get; private set; }
 
+    public SnakeScoreKeeper MyScoreKeeper { get; set; }
+
     [SerializeField] private int StartingSegments = 3;
 
     private Vector3Int stepDirection = new Vector3Int(1, 0, 0);
@@ -36,12 +38,12 @@ public class SnakeHead : SnakeSegment
 
     public virtual void Setup(Node startNode, Color matColor, int index)
     {
-        Setup(startNode,matColor);
+        Setup(startNode, matColor);
         this.startNode = startNode;
         myColor = matColor;
         SnakeIndex = index;
         SetHead(this);
-        SetTail(this);      
+        SetTail(this);
 
         for (int i = 0; i < StartingSegments; i++)
         {
@@ -60,18 +62,25 @@ public class SnakeHead : SnakeSegment
     private void Update()
     {
         if (!isActive) { return; }
+
+        if (MyScoreKeeper != null)
+        {
+            MyScoreKeeper.LifeTime += Time.deltaTime;
+        }
+
+
         if (IsMoving) { return; }
 
         //Move to next node in path
         if (CurrentNode != pathGoalNode && path.Count > 0 && nextPathNodeIndex < path.Count)
-        {      
+        {
 
-            TargetNode = path[nextPathNodeIndex];        
+            TargetNode = path[nextPathNodeIndex];
 
             var followUpIndex = nextPathNodeIndex + 1;
-            if (followUpIndex < path.Count) 
+            if (followUpIndex < path.Count)
             { FollowingNode = path[followUpIndex]; }
-            else 
+            else
             { FollowingNode = null; }
 
             if (savedWalkPenalties.Count > 0)
@@ -152,7 +161,7 @@ public class SnakeHead : SnakeSegment
         var spawnNode = tail.CurrentNode;
         spawnNode.ChangeWalkableState(false);
         var tempSegment = Instantiate(snakeSegmentPrefab, spawnNode.WorldPosition, Quaternion.identity, transform.parent);
-        tempSegment.Setup(spawnNode, myColor ,moveSpeed);
+        tempSegment.Setup(spawnNode, myColor, moveSpeed);
         tail.FollowingSegment = tempSegment;
         SetTail(tempSegment);
     }
@@ -191,14 +200,18 @@ public class SnakeHead : SnakeSegment
     private IEnumerator ActivateCollider()
     {
         yield return new WaitForSeconds(0.5f);
-        var col=GetComponent<Collider>();
+        var col = GetComponent<Collider>();
         col.enabled = true;
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == FollowingSegment) { return; }
-        if (other.CompareTag("Fruit")) { return; }
+        if (other.CompareTag("Fruit"))
+        {
+            if (MyScoreKeeper != null) { MyScoreKeeper.FruitsEaten++; }
+            return;
+        }
 
         KillSnake();
 
@@ -210,7 +223,7 @@ public class SnakeHead : SnakeSegment
     }
 
     private void UpdatePath()
-    {      
+    {
         ChangePath(queuedGoalNode);
     }
 
