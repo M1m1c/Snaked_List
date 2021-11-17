@@ -39,7 +39,6 @@ public class SessionManager : MonoBehaviour
             isInSession = false;
             EndSessionEvent.Invoke();
             SetupUI.SetActive(true);
-            //TODO end session
         }
     }
 
