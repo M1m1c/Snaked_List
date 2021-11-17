@@ -6,8 +6,6 @@ public class SnakeSpawner : MonoBehaviour
 {
     public GameObject SnakePrefab;
 
-    [Range(1, 8)] public int SnakesToSpawn = 1;
-
     private Vector3Int[] spawnCoordinates = new Vector3Int[]
     {
         new Vector3Int(1, 1, 1),
@@ -24,17 +22,24 @@ public class SnakeSpawner : MonoBehaviour
 
     private List<RespawnItem> queuedRespawns = new List<RespawnItem>();
 
+    [Range(1, 8)] private int snakesToSpawn = 1;
     private float respawnTime = 3f;
+
+    public void SetSnakesToSpawn(int value)
+    {
+        snakesToSpawn = value;
+    }
 
     private void Start()
     {
         navVolume = GetComponent<NavVolume>();
-
-        SpawnMultipleSnakes();
+        SessionManager.StartSessionEvent.AddListener(SpawnMultipleSnakes);
     }
 
     private void Update()
     {
+        if (!SessionManager.isInSession) { return; }
+
         if (queuedRespawns.Count == 0) { return; }
 
         for (int i = queuedRespawns.Count - 1; i >= 0; i--)
@@ -58,7 +63,8 @@ public class SnakeSpawner : MonoBehaviour
 
     private void SpawnMultipleSnakes()
     {
-        for (int i = 0; i < SnakesToSpawn; i++)
+        ClearRespawns();
+        for (int i = 0; i < snakesToSpawn; i++)
         {
             var node = navVolume.GetNodeFromIndex(spawnCoordinates[i]);
             if (node == null) { continue; }
@@ -74,6 +80,7 @@ public class SnakeSpawner : MonoBehaviour
         var snakeHead = snakeInstance.GetComponentInChildren<SnakeHead>();
         snakeHead.Setup(node);
         snakeHead.SnakeDeathEvent.AddListener(QueueSnakeRespawn);
+        SessionManager.EndSessionEvent.AddListener(snakeHead.KillSnake);
     }
 
     private void QueueSnakeRespawn(Node spawnNode)
@@ -82,7 +89,12 @@ public class SnakeSpawner : MonoBehaviour
         queuedRespawns.Add(respawnItem);
     }
 
-    class RespawnItem
+    private void ClearRespawns()
+    {
+        queuedRespawns = new List<RespawnItem>();
+    }
+
+    private class RespawnItem
     {
         public Node SpawnNode { get; private set; }
         public float TimeTilSpawn { get; private set; }
