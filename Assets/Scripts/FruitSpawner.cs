@@ -46,5 +46,13 @@ public class FruitSpawner : MonoBehaviour
         fruitInstance = tempRef;
         FruitSpawnEvent.Invoke(spawnNode);
     }
+    private void SpawnFirstFruit()
+    {
+        StartCoroutine(LoadTimer());
+    }
 
+    private void DestroyFruit()
+    {
+        if (fruitInstance) { Destroy(fruitInstance.gameObject); }
+    }
 }
