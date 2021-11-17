@@ -121,7 +121,7 @@ public class SnakeHead : SnakeSegment
 
             foreach (var node in path)
             {
-                node.NodeWalkableDisabled.AddListener(this.UpdatePath);
+                node.NodeWalkableDisabledEvent.AddListener(this.UpdatePath);
                 savedWalkPenalties.Add(node.WalkPenalty);
             }
 
@@ -154,7 +154,7 @@ public class SnakeHead : SnakeSegment
     public void KillSnake()
     {
         isActive = false;
-        ResetWalkPenaltyInAdjacent();
+        ResetWakPenaltiesAlongBody();
         DisableSegment();
         SnakeDeathEvent.Invoke(startNode);
         Destroy(transform.parent.gameObject);
@@ -212,16 +212,28 @@ public class SnakeHead : SnakeSegment
         isWaitingForPath = false;
     }
 
+    private void ResetWakPenaltiesAlongBody()
+    {
+        for (int i = nextPathNodeIndex - 1; i >= 0; i--)
+        {
+            if (i >= path.Count || i < 0) { continue; }
+            var node = path[i];
+            node.ChangeWalkPenaltiesInAdjacentExcluding(-walkPenaltyNearBody, null);
+
+            if (node == tail.CurrentNode) { break; }
+        }
+    }
+
     private void StopListeningToInbetweenNodes()
     {
         if (CurrentNode != null)
         {
-            CurrentNode.NodeWalkableDisabled.RemoveListener(this.UpdatePath);
+            CurrentNode.NodeWalkableDisabledEvent.RemoveListener(this.UpdatePath);
         }
 
         if (TargetNode != null)
         {
-            TargetNode.NodeWalkableDisabled.RemoveListener(this.UpdatePath);
+            TargetNode.NodeWalkableDisabledEvent.RemoveListener(this.UpdatePath);
         }
 
     }
@@ -230,7 +242,7 @@ public class SnakeHead : SnakeSegment
     {
         foreach (var node in path)
         {
-            node.NodeWalkableDisabled.RemoveListener(this.UpdatePath);
+            node.NodeWalkableDisabledEvent.RemoveListener(this.UpdatePath);
         }
         path = new List<Node>();
     }
