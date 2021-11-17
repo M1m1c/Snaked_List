@@ -32,10 +32,11 @@ public class SnakeSpawner : MonoBehaviour
 
     private NavVolume navVolume;
     private FruitSpawner fruitSpawner;
+    private SessionManager sessionManager;
 
     private List<RespawnItem> queuedRespawns = new List<RespawnItem>();
 
-    [Range(1, 8)] private int snakesToSpawn = 1;
+    [Range(1, 8)] public int snakesToSpawn = 1;
     private float respawnTime = 3f;
 
     public void SetSnakesToSpawn(int value)
@@ -47,6 +48,7 @@ public class SnakeSpawner : MonoBehaviour
     {
         navVolume = GetComponent<NavVolume>();
         fruitSpawner = GetComponent<FruitSpawner>();
+        sessionManager = GetComponent<SessionManager>();
         SessionManager.StartSessionEvent.AddListener(SpawnMultipleSnakes);
     }
 
@@ -80,7 +82,7 @@ public class SnakeSpawner : MonoBehaviour
         ClearRespawns();
         for (int i = 0; i < snakesToSpawn; i++)
         {
-           
+            sessionManager.snakeScores.Add(new SnakeScoreKeeper(i, snakeColors[i]));
 
             SpawnSnake(i);
         }
@@ -95,12 +97,17 @@ public class SnakeSpawner : MonoBehaviour
         var pos = node.WorldPosition;
         var snakeInstance = Instantiate(SnakePrefab, pos, Quaternion.identity);
         var snakeHead = snakeInstance.GetComponentInChildren<SnakeHead>();
-        snakeHead.Setup(node,color,snakeIndex);
+
+        var scoreKeper = sessionManager.snakeScores.GetItemWithKey(snakeIndex);
+        if (scoreKeper == null) { return; }
+        snakeHead.MyScoreKeeper = scoreKeper;
+
+        snakeHead.Setup(node, color, snakeIndex);
         snakeHead.SnakeDeathEvent.AddListener(QueueSnakeRespawn);
         SessionManager.EndSessionEvent.AddListener(snakeHead.KillSnake);
 
         var fruitNode = fruitSpawner.GetFruitNode();
-        if (fruitNode != null) 
+        if (fruitNode != null)
         {
             snakeHead.InformFruitExistsInLevel(fruitNode);
         }
@@ -110,7 +117,7 @@ public class SnakeSpawner : MonoBehaviour
     {
         var respawnItem = new RespawnItem(snakeIndex, respawnTime);
 
-        if(queuedRespawns.Exists((q)=> q.SnakeIndex == respawnItem.SnakeIndex)) { return; }
+        if (queuedRespawns.Exists((q) => q.SnakeIndex == respawnItem.SnakeIndex)) { return; }
         queuedRespawns.Add(respawnItem);
     }
 
