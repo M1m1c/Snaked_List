@@ -18,6 +18,18 @@ public class SnakeSpawner : MonoBehaviour
         new Vector3Int(1,1,18),
     };
 
+    private Color[] snakeColors = new Color[]
+    {
+        Color.cyan,
+        Color.red,
+        Color.green,
+        Color.yellow,
+        Color.blue,
+        Color.magenta,
+        new Color(1f,0.7f,0.3f,1f),
+        new Color(0.3f,1f,0.7f,1f)
+    };
+
     private NavVolume navVolume;
     private FruitSpawner fruitSpawner;
 
@@ -57,7 +69,7 @@ public class SnakeSpawner : MonoBehaviour
 
             if (resItem.RespawnTime >= resItem.TimeTilSpawn)
             {
-                SpawnSnake(resItem.SpawnNode);
+                SpawnSnake(resItem.SnakeIndex);
                 queuedRespawns.RemoveAt(i);
             }
         }
@@ -68,19 +80,22 @@ public class SnakeSpawner : MonoBehaviour
         ClearRespawns();
         for (int i = 0; i < snakesToSpawn; i++)
         {
-            var node = navVolume.GetNodeFromIndex(spawnCoordinates[i]);
-            if (node == null) { continue; }
+           
 
-            SpawnSnake(node);
+            SpawnSnake(i);
         }
     }
 
-    private void SpawnSnake(Node node)
+    private void SpawnSnake(int snakeIndex)
     {
+        var node = navVolume.GetNodeFromIndex(spawnCoordinates[snakeIndex]);
+        if (node == null) { return; }
+        var color = snakeColors[snakeIndex];
+
         var pos = node.WorldPosition;
         var snakeInstance = Instantiate(SnakePrefab, pos, Quaternion.identity);
         var snakeHead = snakeInstance.GetComponentInChildren<SnakeHead>();
-        snakeHead.Setup(node);
+        snakeHead.Setup(node,color,snakeIndex);
         snakeHead.SnakeDeathEvent.AddListener(QueueSnakeRespawn);
         SessionManager.EndSessionEvent.AddListener(snakeHead.KillSnake);
 
@@ -91,11 +106,11 @@ public class SnakeSpawner : MonoBehaviour
         }
     }
 
-    private void QueueSnakeRespawn(Node spawnNode)
+    private void QueueSnakeRespawn(int snakeIndex)
     {
-        var respawnItem = new RespawnItem(spawnNode, respawnTime);
+        var respawnItem = new RespawnItem(snakeIndex, respawnTime);
 
-        if(queuedRespawns.Exists((q)=> q.SpawnNode == respawnItem.SpawnNode)) { return; }
+        if(queuedRespawns.Exists((q)=> q.SnakeIndex == respawnItem.SnakeIndex)) { return; }
         queuedRespawns.Add(respawnItem);
     }
 
@@ -106,12 +121,15 @@ public class SnakeSpawner : MonoBehaviour
 
     private class RespawnItem
     {
-        public Node SpawnNode { get; private set; }
+        //public Node SpawnNode { get; private set; }
+
+        public int SnakeIndex { get; private set; }
         public float TimeTilSpawn { get; private set; }
+        //public Color color { get; private set; }
         public float RespawnTime { get; set; }
-        public RespawnItem(Node spawnNode, float timeTilSpawn)
+        public RespawnItem(int index, float timeTilSpawn)
         {
-            SpawnNode = spawnNode;
+            SnakeIndex = index;
             TimeTilSpawn = timeTilSpawn;
             RespawnTime = 0;
         }

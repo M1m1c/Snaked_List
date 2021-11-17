@@ -17,6 +17,9 @@ public class SnakeSegment : MonoBehaviour
 
     protected List<Action> arrivalActions;
 
+    protected Renderer myRenderer;
+
+
     [SerializeField] protected float moveSpeed = 1f;
     [SerializeField] protected int walkPenaltyNearBody = 10;
 
@@ -27,15 +30,19 @@ public class SnakeSegment : MonoBehaviour
         Tail
     }
 
-    public virtual void Setup(Node startNode)
+    public virtual void Setup(Node startNode, Color matColor)
     {
         CurrentNode = startNode;
+        myRenderer = GetComponent<Renderer>();
+        myRenderer.material.color = matColor;
     }
 
-    public virtual void Setup(Node startNode, float speed)
+    public virtual void Setup(Node startNode, Color matColor, float speed)
     {
         CurrentNode = startNode;
         moveSpeed = speed + 1f;
+        myRenderer = GetComponent<Renderer>();
+        myRenderer.material.color = matColor;
     }
 
     public void DisableSegment()

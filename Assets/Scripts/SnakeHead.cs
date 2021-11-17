@@ -9,7 +9,9 @@ public class SnakeHead : SnakeSegment
     public SnakeSegment snakeSegmentPrefab;
     public bool isActive { get; set; }
 
-    public UnityEvent<Node> SnakeDeathEvent = new UnityEvent<Node>();
+    public UnityEvent<int> SnakeDeathEvent = new UnityEvent<int>();
+
+    public int SnakeIndex { get; private set; }
 
     [SerializeField] private int StartingSegments = 3;
 
@@ -27,15 +29,19 @@ public class SnakeHead : SnakeSegment
     private SnakeSegment head;
     private SnakeSegment tail;
 
+    private Color myColor;
+
     private int nextPathNodeIndex = 0;
 
 
-    public override void Setup(Node startNode)
+    public virtual void Setup(Node startNode, Color matColor, int index)
     {
-        base.Setup(startNode);
+        Setup(startNode,matColor);
         this.startNode = startNode;
+        myColor = matColor;
+        SnakeIndex = index;
         SetHead(this);
-        SetTail(this);
+        SetTail(this);      
 
         for (int i = 0; i < StartingSegments; i++)
         {
@@ -146,7 +152,7 @@ public class SnakeHead : SnakeSegment
         var spawnNode = tail.CurrentNode;
         spawnNode.ChangeWalkableState(false);
         var tempSegment = Instantiate(snakeSegmentPrefab, spawnNode.WorldPosition, Quaternion.identity, transform.parent);
-        tempSegment.Setup(spawnNode, moveSpeed);
+        tempSegment.Setup(spawnNode, myColor ,moveSpeed);
         tail.FollowingSegment = tempSegment;
         SetTail(tempSegment);
     }
@@ -156,7 +162,7 @@ public class SnakeHead : SnakeSegment
         isActive = false;
         ResetWakPenaltiesAlongBody();
         DisableSegment();
-        SnakeDeathEvent.Invoke(startNode);
+        SnakeDeathEvent.Invoke(SnakeIndex);
         Destroy(transform.parent.gameObject);
     }
 
