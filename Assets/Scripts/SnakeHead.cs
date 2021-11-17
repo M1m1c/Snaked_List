@@ -57,7 +57,7 @@ public class SnakeHead : SnakeSegment
         if (IsMoving) { return; }
 
         //Move to next node in path
-        if (CurrentNode != pathGoalNode && path.Count > 0)
+        if (CurrentNode != pathGoalNode && path.Count > 0 && nextPathNodeIndex < path.Count)
         {      
 
             TargetNode = path[nextPathNodeIndex];        
@@ -83,7 +83,11 @@ public class SnakeHead : SnakeSegment
             if (path.Count == 0 && pathGoalNode != null && isWaitingForPath == false)
             {
                 isWaitingForPath = true;
-                PathRequestManager.RequestPath(transform.position, pathGoalNode.WorldPosition, OnPathFound);
+                PathRequestManager.RequestPath(
+                    transform.position,
+                    pathGoalNode.WorldPosition,
+                    OnPathFound,
+                    this.gameObject);
             }
             else if (CurrentNode == pathGoalNode || pathGoalNode == null)
             {
@@ -128,7 +132,11 @@ public class SnakeHead : SnakeSegment
         {
             pathGoalNode = NavVolume.NavVolumeInstance.GetRandomNode();
             isWaitingForPath = true;
-            PathRequestManager.RequestPath(transform.position, pathGoalNode.WorldPosition, OnPathFound);
+            PathRequestManager.RequestPath(
+                transform.position,
+                pathGoalNode.WorldPosition,
+                OnPathFound,
+                this.gameObject);
 
         }
     }
