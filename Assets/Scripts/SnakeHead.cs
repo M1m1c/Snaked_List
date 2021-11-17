@@ -2,16 +2,22 @@ using m1m1c_3DAstarPathfinding;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SnakeHead : SnakeSegment
 {
     public SnakeSegment snakeSegmentPrefab;
     public bool isActive { get; set; }
 
+    public UnityEvent<Node> SnakeDeathEvent = new UnityEvent<Node>();
+
+    [SerializeField] private int StartingSegments = 3;
+
     private Vector3Int stepDirection = new Vector3Int(1, 0, 0);
 
     private Node pathGoalNode;
     private Node queuedGoalNode;
+    private Node startNode;
 
     private List<Node> path = new List<Node>();
     private List<int> savedWalkPenalties = new List<int>();
@@ -27,8 +33,11 @@ public class SnakeHead : SnakeSegment
     public override void Setup(Node startNode)
     {
         base.Setup(startNode);
+        this.startNode = startNode;
         SetHead(this);
         SetTail(this);
+
+        
 
         arrivalActions = new List<System.Action>();
         arrivalActions.Add(StopListeningToInbetweenNodes);
@@ -157,6 +166,7 @@ public class SnakeHead : SnakeSegment
         isActive = false;
         ResetWalkPenaltyInAdjacent();
         DisableSegment();
+        SnakeDeathEvent.Invoke(startNode);
         Destroy(transform.parent.gameObject);
 
     }
