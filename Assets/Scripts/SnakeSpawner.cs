@@ -86,6 +86,8 @@ public class SnakeSpawner : MonoBehaviour
     private void QueueSnakeRespawn(Node spawnNode)
     {
         var respawnItem = new RespawnItem(spawnNode, respawnTime);
+
+        if(queuedRespawns.Exists((q)=> q.SpawnNode == respawnItem.SpawnNode)) { return; }
         queuedRespawns.Add(respawnItem);
     }
 
