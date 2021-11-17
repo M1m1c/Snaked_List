@@ -19,6 +19,7 @@ public class SnakeSpawner : MonoBehaviour
     };
 
     private NavVolume navVolume;
+    private FruitSpawner fruitSpawner;
 
     private List<RespawnItem> queuedRespawns = new List<RespawnItem>();
 
@@ -33,6 +34,7 @@ public class SnakeSpawner : MonoBehaviour
     private void Start()
     {
         navVolume = GetComponent<NavVolume>();
+        fruitSpawner = GetComponent<FruitSpawner>();
         SessionManager.StartSessionEvent.AddListener(SpawnMultipleSnakes);
     }
 
@@ -81,6 +83,12 @@ public class SnakeSpawner : MonoBehaviour
         snakeHead.Setup(node);
         snakeHead.SnakeDeathEvent.AddListener(QueueSnakeRespawn);
         SessionManager.EndSessionEvent.AddListener(snakeHead.KillSnake);
+
+        var fruitNode = fruitSpawner.GetFruitNode();
+        if (fruitNode != null) 
+        {
+            snakeHead.InformFruitExistsInLevel(fruitNode);
+        }
     }
 
     private void QueueSnakeRespawn(Node spawnNode)

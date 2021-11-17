@@ -13,6 +13,17 @@ public class FruitSpawner : MonoBehaviour
 
     private FruitPickup fruitInstance;
 
+    public Node GetFruitNode()
+    {
+        Node retval = null;
+
+        if (fruitInstance)
+        {
+            retval = fruitInstance.SpawnNode;
+        }
+        return retval;
+    }
+
     private void Start()
     {
         navVolume = GetComponent<NavVolume>();
@@ -45,6 +56,7 @@ public class FruitSpawner : MonoBehaviour
         var tempRef = Instantiate(FruitPrefab, spawnNode.WorldPosition, Quaternion.identity);
         tempRef.FruitEatenEvent.AddListener(SpawnFruit);
         fruitInstance = tempRef;
+        fruitInstance.Setup(spawnNode);
         FruitSpawnEvent.Invoke(spawnNode);
     }
     private void SpawnFirstFruit()

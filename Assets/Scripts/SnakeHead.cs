@@ -160,6 +160,11 @@ public class SnakeHead : SnakeSegment
         Destroy(transform.parent.gameObject);
     }
 
+    public void InformFruitExistsInLevel(Node fruitNode)
+    {
+        ChangePath(fruitNode);
+    }
+
     private bool CheckForQueuedGoal()
     {
         var retval = false;
