@@ -16,9 +16,10 @@ public class FruitSpawner : MonoBehaviour
     private void Start()
     {
         navVolume = GetComponent<NavVolume>();
-        StartCoroutine(LoadTimer());
+        SessionManager.StartSessionEvent.AddListener(SpawnFirstFruit);
+        SessionManager.EndSessionEvent.AddListener(DestroyFruit);
     }
-
+  
     private IEnumerator LoadTimer()
     {
         yield return new WaitForSeconds(0.5f);
