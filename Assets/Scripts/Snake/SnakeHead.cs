@@ -242,7 +242,7 @@ public class SnakeHead : SnakeSegment
         {
             if (i >= path.Count || i < 0) { continue; }
             var node = path[i];
-            node.ChangeWalkPenaltiesInAdjacentExcluding(-walkPenaltyNearBody, null);
+            node.InvokeWalkPenaltiesEvent(-walkPenaltyNearBody, null);
 
             if (node == tail.CurrentNode) { break; }
         }

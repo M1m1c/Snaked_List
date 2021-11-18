@@ -98,9 +98,9 @@ public class SnakeSegment : MonoBehaviour
             nodeOccupationActions[1] = () => CurrentNode.ChangeWalkableState(true);
 
             nodeOccupationActions[2] = () =>
-            TargetNode.ChangeWalkPenaltiesInAdjacentExcluding(walkPenaltyNearBody, FollowingNode);
+            TargetNode.InvokeWalkPenaltiesEvent(walkPenaltyNearBody, FollowingNode);
             nodeOccupationActions[3] = () =>
-            CurrentNode.ChangeWalkPenaltiesInAdjacentExcluding(-walkPenaltyNearBody, null);
+            CurrentNode.InvokeWalkPenaltiesEvent(-walkPenaltyNearBody, null);
         }
         else
         {
@@ -110,13 +110,13 @@ public class SnakeSegment : MonoBehaviour
             {
                 nodeOccupationActions[0] = () => TargetNode.ChangeWalkableState(false);
                 nodeOccupationActions[1] = () =>
-                TargetNode.ChangeWalkPenaltiesInAdjacentExcluding(walkPenaltyNearBody, FollowingNode);
+                TargetNode.InvokeWalkPenaltiesEvent(walkPenaltyNearBody, FollowingNode);
             }
             else if (MySegmentType == SegmentType.Tail)
             {
                 nodeOccupationActions[0] = () => CurrentNode.ChangeWalkableState(true);
                 nodeOccupationActions[1] = () =>
-                CurrentNode.ChangeWalkPenaltiesInAdjacentExcluding(-walkPenaltyNearBody, null);
+                CurrentNode.InvokeWalkPenaltiesEvent(-walkPenaltyNearBody, null);
             }
             else
             {

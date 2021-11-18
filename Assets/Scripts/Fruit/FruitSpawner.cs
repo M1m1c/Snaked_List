@@ -41,7 +41,7 @@ public class FruitSpawner : MonoBehaviour
     {
         if (fruitInstance != null && fruitInstance.pendingDestruction == false) { return; }
 
-        navVolume.ResetWalkPenalties();
+        navVolume.ResetWalkPenaltiesInAllNodes();
 
         Node spawnNode;
         while (true)
