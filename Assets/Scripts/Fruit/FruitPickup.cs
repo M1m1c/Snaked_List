@@ -5,9 +5,15 @@ using UnityEngine.Events;
 public class FruitPickup : MonoBehaviour
 {
     public UnityEvent FruitEatenEvent = new UnityEvent();
-    public Node SpawnNode { get; private set; }
+    public Node SpawnNode { get; private set; } 
 
-    public bool pendingDestruction = false;
+    public bool PendingDestruction
+    {
+        get { return pendingDestruction; }
+        private set { pendingDestruction = value; }
+    }
+
+    private bool pendingDestruction = false;
 
     public void Setup(Node spawnNode)
     {
@@ -20,7 +26,7 @@ public class FruitPickup : MonoBehaviour
         if (snakeHead)
         {
             snakeHead.AddSnakeSegment();
-            pendingDestruction = true;
+            PendingDestruction = true;
             FruitEatenEvent.Invoke();
             Destroy(gameObject);
         }
