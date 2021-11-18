@@ -7,12 +7,10 @@ using UnityEngine.Events;
 public class SnakeHead : SnakeSegment
 {
     public SnakeSegment snakeSegmentPrefab;
-    public bool isActive { get; set; }
 
     public UnityEvent<int> SnakeDeathEvent = new UnityEvent<int>();
-
+    public bool isActive { get; set; }
     public int SnakeIndex { get; private set; }
-
     public ScoreKeeper MyScoreKeeper { get; set; }
 
     [SerializeField] private int StartingSegments = 3;
@@ -21,7 +19,6 @@ public class SnakeHead : SnakeSegment
 
     private Node pathGoalNode;
     private Node queuedGoalNode;
-    private Node startNode;
 
     private List<Node> path = new List<Node>();
     private List<int> savedWalkPenalties = new List<int>();
@@ -39,7 +36,6 @@ public class SnakeHead : SnakeSegment
     public virtual void Setup(Node startNode, Color matColor, int index)
     {
         Setup(startNode, matColor);
-        this.startNode = startNode;
         myColor = matColor;
         SnakeIndex = index;
         SetHead(this);
@@ -59,10 +55,12 @@ public class SnakeHead : SnakeSegment
         StartCoroutine(ActivationTimer());
     }
 
+    //Handles movement, path requesting and where to move next
     private void Update()
     {
         if (!isActive) { return; }
 
+        //Update Lifetime
         if (MyScoreKeeper != null)
         {
             MyScoreKeeper.LifeTime += Time.deltaTime;
@@ -71,52 +69,18 @@ public class SnakeHead : SnakeSegment
 
         if (IsMoving) { return; }
 
-        //Move to next node in path
+        //Set next node in path to target node
         if (CurrentNode != pathGoalNode && path.Count > 0 && nextPathNodeIndex < path.Count)
         {
-
-            TargetNode = path[nextPathNodeIndex];
-
-            var followUpIndex = nextPathNodeIndex + 1;
-            if (followUpIndex < path.Count)
-            { FollowingNode = path[followUpIndex]; }
-            else
-            { FollowingNode = null; }
-
-            if (savedWalkPenalties.Count > 0)
-            {
-                var savedWalkPenalty = savedWalkPenalties[nextPathNodeIndex];
-                if (TargetNode.WalkPenalty > savedWalkPenalty)
-                {
-                    UpdatePath();
-                }
-            }
-
+            ProgressAlongPath();
         }
         else
         {
-            if (path.Count == 0 && pathGoalNode != null && isWaitingForPath == false)
-            {
-                isWaitingForPath = true;
-                PathRequestManager.RequestPath(
-                    transform.position,
-                    pathGoalNode.WorldPosition,
-                    OnPathFound,
-                    this.gameObject);
-            }
-            else if (CurrentNode == pathGoalNode || pathGoalNode == null)
-            {
-                ClearPath();
-
-                if (!CheckForQueuedGoal())
-                {
-                    pathGoalNode = NavVolume.NavVolumeInstance.GetRandomNode();
-                }
-            }
+            GetNewPathOrNewGoal();
             return;
         }
 
-
+        //if no target node, keep moving in the same direction
         if (TargetNode == null)
         {
             TargetNode = NavVolume.NavVolumeInstance.GetNodeFromIndex(CurrentNode.volumeCoordinate + stepDirection);
@@ -127,6 +91,8 @@ public class SnakeHead : SnakeSegment
         SetStepDirection(CurrentNode.volumeCoordinate, TargetNode.volumeCoordinate);
     }
 
+    //Set path on callback, if no valid path was found request a new one
+    //Ave the values of the alkpenalties in the path, used later for checking if another snake is adjacent to path
     public void OnPathFound(List<Node> newPath, bool pathSuccessful)
     {
         if (pathSuccessful)
@@ -175,11 +141,57 @@ public class SnakeHead : SnakeSegment
         Destroy(transform.parent.gameObject);
     }
 
+    //if the snake spawned after a fruit and missed its invoke, inform it that there is a fruit
     public void InformFruitExistsInLevel(Node fruitNode)
     {
         ChangePath(fruitNode);
     }
 
+    //sets the target node to the next node in path,
+    //stores node that comes after target node in path,
+    //makes call for checking if target nodes walk penalty hase changed
+    private void ProgressAlongPath()
+    {
+        TargetNode = path[nextPathNodeIndex];
+
+        var followUpIndex = nextPathNodeIndex + 1;
+        if (followUpIndex < path.Count)
+        { FollowingNode = path[followUpIndex]; }
+        else
+        { FollowingNode = null; }
+
+        CheckForWalkPenaltyChange();
+    }
+
+    //Requests a path if there is none,
+    //requests a new goal node if there is none or the path ahs been completed
+    private void GetNewPathOrNewGoal()
+    {
+        //Request new path
+        if (path.Count == 0 && pathGoalNode != null && isWaitingForPath == false)
+        {
+            isWaitingForPath = true;
+            PathRequestManager.RequestPath(
+                transform.position,
+                pathGoalNode.WorldPosition,
+                OnPathFound,
+                this.gameObject);
+        }
+        //Set new goal node to random if no fruit node is queued
+        else if (CurrentNode == pathGoalNode || pathGoalNode == null)
+        {
+            ClearPath();
+
+            if (!CheckForQueuedGoal())
+            {
+                pathGoalNode = NavVolume.NavVolumeInstance.GetRandomNode();
+            }
+        }
+    }
+
+
+
+    //if there is a queued goal, then set path goal node to it
     private bool CheckForQueuedGoal()
     {
         var retval = false;
@@ -190,6 +202,21 @@ public class SnakeHead : SnakeSegment
         }
         return retval;
     }
+
+    //if the target node has a higher walk penalty then when we generated the path,
+    //then that means there is a snake nearby and we should update our path.
+    private void CheckForWalkPenaltyChange()
+    {
+        if (savedWalkPenalties.Count > 0)
+        {
+            var savedWalkPenalty = savedWalkPenalties[nextPathNodeIndex];
+            if (TargetNode.WalkPenalty > savedWalkPenalty)
+            {
+                UpdatePath();
+            }
+        }
+    }
+
     private IEnumerator ActivationTimer()
     {
         yield return new WaitForSeconds(1f);
@@ -197,6 +224,7 @@ public class SnakeHead : SnakeSegment
         isActive = true;
     }
 
+    //used to stager the activation of teh collider, so snake does not immediately die
     private IEnumerator ActivateCollider()
     {
         yield return new WaitForSeconds(0.5f);
@@ -204,6 +232,7 @@ public class SnakeHead : SnakeSegment
         col.enabled = true;
     }
 
+    //Handles colliding with fruit or something that will kill the player
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == FollowingSegment) { return; }
@@ -222,11 +251,14 @@ public class SnakeHead : SnakeSegment
         queuedGoalNode = fruitNode;
     }
 
+    //Used to request an updated path if a node in the path becomes unwalkable,
+    //becasue that means another snake has stepped onto our path.
     private void UpdatePath()
     {
         ChangePath(queuedGoalNode);
     }
 
+    //stops movement, clears the path so a new one can be requested in the next update cycle
     private void ChangePath(Node newFruitNode)
     {
         StopCoroutine(MoveToTarget(nodeOccupationActions));
@@ -236,6 +268,7 @@ public class SnakeHead : SnakeSegment
         isWaitingForPath = false;
     }
 
+    //Reverts back the changes to walk penalties in the nodes adjacent to each segment of the snake
     private void ResetWakPenaltiesAlongBody()
     {
         for (int i = nextPathNodeIndex - 1; i >= 0; i--)
@@ -248,6 +281,7 @@ public class SnakeHead : SnakeSegment
         }
     }
 
+    //stops listening for evetns  in the nodes we have passed in our path
     private void StopListeningToInbetweenNodes()
     {
         if (CurrentNode != null)
@@ -276,6 +310,7 @@ public class SnakeHead : SnakeSegment
         nextPathNodeIndex++;
     }
 
+    //used for determining which direction to walk if we don't have a path
     private void SetStepDirection(Vector3Int currentCoord, Vector3Int newCoord)
     {
         stepDirection = new Vector3Int(
@@ -311,26 +346,4 @@ public class SnakeHead : SnakeSegment
         segmentToUse.MySegmentType |= SegmentType.Tail;
         tail = segmentToUse;
     }
-
-    public void OnDrawGizmos()
-    {
-        if (path != null)
-        {
-            for (int i = nextPathNodeIndex; i < path.Count; i++)
-            {
-                Gizmos.color = Color.black;
-                Gizmos.DrawCube(path[i].WorldPosition, new Vector3(.2f, .2f, .2f));
-
-                if (i == nextPathNodeIndex)
-                {
-                    Gizmos.DrawLine(transform.position, path[i].WorldPosition);
-                }
-                else
-                {
-                    Gizmos.DrawLine(path[i - 1].WorldPosition, path[i].WorldPosition);
-                }
-            }
-        }
-    }
-
 }
