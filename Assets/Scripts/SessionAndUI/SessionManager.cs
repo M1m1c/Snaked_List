@@ -9,9 +9,9 @@ public class SessionManager : MonoBehaviour
 
     public static UnityEvent StartSessionEvent = new UnityEvent();
     public static UnityEvent EndSessionEvent = new UnityEvent();
-    public static bool isInSession { get; private set; }
+    public static bool IsInSession { get; private set; }
 
-    public Heap<ScoreKeeper> snakeScores = new Heap<ScoreKeeper>(8);
+    public Heap<ScoreKeeper> SnakeScores = new Heap<ScoreKeeper>(8);
 
     public GameObject SetupUI;
 
@@ -42,18 +42,18 @@ public class SessionManager : MonoBehaviour
     private void Update()
     {
 
-        if (!isInSession) { return; }
+        if (!IsInSession) { return; }
         sessionTimer += Time.deltaTime;
         PlayTimerText.text = $"{sessionTimer.ToString("F2")} / {playTimeThreshold}";
 
-        if (snakeScores.Count > 0 && snakeScoreSlots.Count > 0)
+        if (SnakeScores.Count > 0 && snakeScoreSlots.Count > 0)
         {
             UpdateScoreSlots();
         }
 
         if (sessionTimer >= playTimeThreshold)
         {
-            isInSession = false;
+            IsInSession = false;
             EndSessionEvent.Invoke();
             SetupUI.SetActive(true);
         }
@@ -63,8 +63,8 @@ public class SessionManager : MonoBehaviour
     private void UpdateScoreSlots()
     {
         var index = 0;
-        snakeScores.Sort();
-        foreach (var score in snakeScores)
+        SnakeScores.Sort();
+        foreach (var score in SnakeScores)
         {
             if (index > snakeScoreSlots.Count) { break; }
             var slot = snakeScoreSlots[index];
@@ -82,14 +82,14 @@ public class SessionManager : MonoBehaviour
     {
         if (SetupUI) { SetupUI.SetActive(false); }
 
-        snakeScores.Clear();
+        SnakeScores.Clear();
         StartSessionEvent.Invoke();
 
         RemoveScoreSlotsIfPresent();
         InitaliseScoreSlots();
 
         sessionTimer = 0f;
-        isInSession = true;
+        IsInSession = true;
     }
 
     private void RemoveScoreSlotsIfPresent()
@@ -110,7 +110,7 @@ public class SessionManager : MonoBehaviour
     {
         scoreSlotYOffset = originalScoreSlotYOffset;
         var firstSlot = true;
-        foreach (var item in snakeScores)
+        foreach (var item in SnakeScores)
         {
             if (item == null) { continue; }
 

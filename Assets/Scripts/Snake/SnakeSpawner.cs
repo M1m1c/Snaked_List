@@ -54,7 +54,7 @@ public class SnakeSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (!SessionManager.isInSession) { return; }
+        if (!SessionManager.IsInSession) { return; }
 
         if (queuedRespawns.Count == 0) { return; }
 
@@ -82,7 +82,7 @@ public class SnakeSpawner : MonoBehaviour
         ClearRespawns();
         for (int i = 0; i < snakesToSpawn; i++)
         {
-            sessionManager.snakeScores.Add(new ScoreKeeper(i, snakeColors[i]));
+            sessionManager.SnakeScores.Add(new ScoreKeeper(i, snakeColors[i]));
 
             SpawnSnake(i);
         }
@@ -98,7 +98,7 @@ public class SnakeSpawner : MonoBehaviour
         var snakeInstance = Instantiate(SnakePrefab, pos, Quaternion.identity);
         var snakeHead = snakeInstance.GetComponentInChildren<SnakeHead>();
 
-        var scoreKeper = sessionManager.snakeScores.GetItemWithKey(snakeIndex);
+        var scoreKeper = sessionManager.SnakeScores.GetItemWithKey(snakeIndex);
         if (scoreKeper == null) { return; }
         snakeHead.MyScoreKeeper = scoreKeper;
 
