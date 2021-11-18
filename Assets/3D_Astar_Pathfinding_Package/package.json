@@ -1,0 +1,12 @@
+{
+  "name": "com.m1m1c.3D_Astar_Pathfinding_Package",
+  "version": "0.0.1",
+  "displayName": "m1m1c 3D Astar Pathfinding Package",
+  "description": "sample Text",
+  "unity": "2020.3.16",
+  "author": {
+    "name": "Ludvig Baummann Olsson",
+    "email": "ludbaumolss-business@hotmail.com",
+    "url": "http://ludvigbaummannolsson.com/"
+  }
+}
