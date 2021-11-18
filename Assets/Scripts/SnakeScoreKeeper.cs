@@ -22,19 +22,25 @@ public class SnakeScoreKeeper : IHeapItem<SnakeScoreKeeper>
 
     public int CompareTo(SnakeScoreKeeper other)
     {
-        int compare = -1;
+        var compare = 0;
 
-        var myVal = (float)FruitsEaten * LifeTime;
-
-        if (other != null)
+        if (other != null && other != this)
         {
-            var otherVal = (float)other.FruitsEaten * other.LifeTime;
-            if (otherVal < myVal)
+            var myVal = ((float)FruitsEaten) * LifeTime;
+            var otherVal = ((float)other.FruitsEaten) * other.LifeTime;
+            var notTooSimilar = !Mathf.Approximately(myVal, otherVal);
+            var myValueIsZero = Mathf.Approximately(myVal, 0f);
+            var otherValueIsZero = Mathf.Approximately(otherVal, 0f);
+
+            if ( (myVal < otherVal || myValueIsZero) && notTooSimilar)
             {
-                compare = -compare;
+                compare = -1;
+            }
+            else if ( (myVal > otherVal || otherValueIsZero) && notTooSimilar)
+            {
+                compare = 1;
             }
         }
-        
 
         return compare;
     }
