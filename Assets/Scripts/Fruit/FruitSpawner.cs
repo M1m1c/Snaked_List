@@ -13,6 +13,7 @@ public class FruitSpawner : MonoBehaviour
 
     private FruitPickup fruitInstance;
 
+    //Returns the node the fruit si located on
     public Node GetFruitNode()
     {
         Node retval = null;
@@ -37,6 +38,7 @@ public class FruitSpawner : MonoBehaviour
         SpawnFruit();
     }
 
+    //Spawns a fruit on a random node that is walkable within the volume
     private void SpawnFruit()
     {
         if (fruitInstance != null && fruitInstance.PendingDestruction == false) { return; }
@@ -59,6 +61,7 @@ public class FruitSpawner : MonoBehaviour
         fruitInstance.Setup(spawnNode);
         FruitSpawnEvent.Invoke(spawnNode);
     }
+
     private void SpawnFirstFruit()
     {
         StartCoroutine(LoadTimer());
