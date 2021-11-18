@@ -58,4 +58,7 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
-Assets/3D_Astar_Pathfinding_Package
+Assets/3D_Astar_Pathfinding_Package/.gitignore
+
+Assets/3D_Astar_Pathfinding_Package/Runtime/NavAgent.cs.meta
+Assets/3D_Astar_Pathfinding_Package/Runtime/NavAgent.cs
