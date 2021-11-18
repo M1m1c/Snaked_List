@@ -26,7 +26,7 @@ public class SessionManager : MonoBehaviour
 
     private List<SnakeScoreSlot> snakeScoreSlots = new List<SnakeScoreSlot>();
 
-    private float playTime = 60f;
+    private float playTimeThreshold = 60f;
     private float sessionTimer = 0f;
 
 
@@ -38,19 +38,32 @@ public class SessionManager : MonoBehaviour
         snakeSpawner = GetComponent<SnakeSpawner>();
     }
 
+    //Increases session timer and stops session if the timer reches the playtimeThreshold
     private void Update()
     {
 
         if (!isInSession) { return; }
         sessionTimer += Time.deltaTime;
-        PlayTimerText.text = $"{sessionTimer.ToString("F2")} / {playTime}";
+        PlayTimerText.text = $"{sessionTimer.ToString("F2")} / {playTimeThreshold}";
 
-        foreach (var score in snakeScores)
+        if (snakeScores.Count > 0 && snakeScoreSlots.Count > 0)
         {
-            snakeScores.UpdateItem(score);
+            UpdateScoreSlots();
         }
 
+        if (sessionTimer >= playTimeThreshold)
+        {
+            isInSession = false;
+            EndSessionEvent.Invoke();
+            SetupUI.SetActive(true);
+        }
+    }
+
+    //Updates the Score slot UI to show who is winning
+    private void UpdateScoreSlots()
+    {
         var index = 0;
+        snakeScores.Sort();
         foreach (var score in snakeScores)
         {
             if (index > snakeScoreSlots.Count) { break; }
@@ -62,26 +75,25 @@ public class SessionManager : MonoBehaviour
             slot.SetLifeTime(score.LifeTime);
             index++;
         }
-
-        if (sessionTimer >= playTime)
-        {
-            isInSession = false;
-            EndSessionEvent.Invoke();
-            SetupUI.SetActive(true);
-        }
     }
 
+    //Removes setup UI and starts game session
     public void StartSession()
     {
         if (SetupUI) { SetupUI.SetActive(false); }
 
-
         snakeScores.Clear();
         StartSessionEvent.Invoke();
+
+        RemoveScoreSlotsIfPresent();
+        InitaliseScoreSlots();
+
         sessionTimer = 0f;
         isInSession = true;
+    }
 
-
+    private void RemoveScoreSlotsIfPresent()
+    {
         if (snakeScoreSlots.Count > 0)
         {
             for (int i = snakeScoreSlots.Count - 1; i >= 0; i--)
@@ -90,22 +102,25 @@ public class SessionManager : MonoBehaviour
             }
             snakeScoreSlots = new List<SnakeScoreSlot>();
         }
+    }
 
+    //Adds score slot UI to the screen and gives each the correct index and color.
+    //Stores newly created slots in snakeScoreSlots list
+    private void InitaliseScoreSlots()
+    {
         scoreSlotYOffset = originalScoreSlotYOffset;
-        var firstTime = false;
+        var firstSlot = true;
         foreach (var item in snakeScores)
         {
             if (item == null) { continue; }
 
-            var slot = Instantiate(
-                scoreSlotPrefab,
-                ScoreSlotHolder.position - new Vector3(0f, scoreSlotYOffset, 0f),
-                Quaternion.identity,
-                ScoreSlotHolder);
+            var spawnPos = ScoreSlotHolder.position - new Vector3(0f, scoreSlotYOffset, 0f);
 
-            if (!firstTime)
+            var slot = Instantiate(scoreSlotPrefab, spawnPos, Quaternion.identity, ScoreSlotHolder);
+
+            if (firstSlot)
             {
-                firstTime = true;
+                firstSlot = false;
                 var slotTransform = slot.gameObject.transform;
                 slotTransform.localScale += new Vector3(.3f, .3f, .3f);
                 slotTransform.position += new Vector3(-39f, 20f, 0f);
@@ -117,7 +132,6 @@ public class SessionManager : MonoBehaviour
             slot.SetSnakeIndex(item.SnakeIndex);
 
             snakeScoreSlots.Add(slot);
-
         }
     }
 
@@ -129,8 +143,9 @@ public class SessionManager : MonoBehaviour
 
     public void SetPlayTime(System.Single value)
     {
-        playTime = ((float)value) * 60f;
+        playTimeThreshold = ((float)value) * 60f;
         if (PlayTimeSlideNumber) { PlayTimeSlideNumber.text = "" + value; }
     }
+
 
 }
