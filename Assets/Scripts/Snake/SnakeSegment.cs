@@ -3,22 +3,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 public class SnakeSegment : MonoBehaviour
 {
-
-    public bool IsMoving { get; protected set; }
+    public SegmentType MySegmentType { get; set; }
+    public SnakeSegment FollowingSegment { get; set; }
     public Node TargetNode { get; set; }
     public Node FollowingNode { get; set; }
     public Node CurrentNode { get; protected set; }
-    public SegmentType MySegmentType { get; set; }
-    public SnakeSegment FollowingSegment { get; set; }
+    public bool IsMoving { get; protected set; }
 
     protected Action[] nodeOccupationActions = new Action[2];
 
     protected List<Action> arrivalActions;
 
     protected Renderer myRenderer;
-
 
     [SerializeField] protected float moveSpeed = 1f;
     [SerializeField] protected int walkPenaltyNearBody = 10;
@@ -37,6 +36,7 @@ public class SnakeSegment : MonoBehaviour
         myRenderer.material.color = matColor;
     }
 
+    //Used by non head segments to make sure they can keep up with the head
     public virtual void Setup(Node startNode, Color matColor, float speed)
     {
         CurrentNode = startNode;
@@ -56,21 +56,7 @@ public class SnakeSegment : MonoBehaviour
         if (FollowingSegment) { FollowingSegment.DisableSegment(); }
     }
 
-    public void ResetWalkPenaltyInAdjacent()
-    {
-        if (CurrentNode != null)
-        {
-            CurrentNode.WalkPenalty = 0;
-        }
-
-        if (TargetNode != null)
-        {
-            TargetNode.WalkPenalty = 0;
-        }
-
-        if (FollowingSegment) { FollowingSegment.ResetWalkPenaltyInAdjacent(); }
-    }
-
+    //Initiates the transition between two nodes and makes sure the following segment also moves
     public void StartMoving()
     {
         if (IsMoving) { return; }
@@ -85,11 +71,15 @@ public class SnakeSegment : MonoBehaviour
         StartMovingFollowingSegment();
     }
 
-
+    // used for setting up if there are any specific actions
+    // that this segment needs to call in the nodes it traverses.
+    // Mainly used by head and tail segments to make nodes walkable,
+    // unwalkable or affect their walk penalty.
     private void DetemineNodeOccupationActions()
     {
         if (MySegmentType == SegmentType.None && nodeOccupationActions.Length == 0) { return; }
 
+        //edge case for if the snake only has a head and no other segments
         if (MySegmentType.HasFlag(SegmentType.Head) && MySegmentType.HasFlag(SegmentType.Tail))
         {
             if (nodeOccupationActions.Length < 4) { nodeOccupationActions = new Action[4]; }
@@ -125,6 +115,7 @@ public class SnakeSegment : MonoBehaviour
         }
     }
 
+    //Moves this segment between two positions(nodes) over time.
     protected IEnumerator MoveToTarget(Action[] occupationActionsToCall)
     {
         if (TargetNode == null)
@@ -175,6 +166,8 @@ public class SnakeSegment : MonoBehaviour
         }
     }
 
+    //Initiates movment in the next segment connected to this, 
+    //if it is not occupying the same node as this.
     private void StartMovingFollowingSegment()
     {
         if (FollowingSegment)
