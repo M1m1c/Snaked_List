@@ -6,6 +6,8 @@ public class SnakeSpawner : MonoBehaviour
 {
     public GameObject SnakePrefab;
 
+    [Range(1, 8)] public int snakesToSpawn = 1;
+
     private Vector3Int[] spawnCoordinates = new Vector3Int[]
     {
         new Vector3Int(1, 1, 1),
@@ -36,7 +38,6 @@ public class SnakeSpawner : MonoBehaviour
 
     private List<RespawnItem> queuedRespawns = new List<RespawnItem>();
 
-    [Range(1, 8)] public int snakesToSpawn = 1;
     private float respawnTime = 3f;
 
     public void SetSnakesToSpawn(int value)
@@ -52,6 +53,7 @@ public class SnakeSpawner : MonoBehaviour
         SessionManager.StartSessionEvent.AddListener(SpawnMultipleSnakes);
     }
 
+    //Handles respawning of snakes by looping through the queued respawns and their timers
     private void Update()
     {
         if (!SessionManager.IsInSession) { return; }
@@ -77,6 +79,7 @@ public class SnakeSpawner : MonoBehaviour
         }
     }
 
+    //Called on start session spawns the amount of snakes set
     private void SpawnMultipleSnakes()
     {
         ClearRespawns();
@@ -88,6 +91,7 @@ public class SnakeSpawner : MonoBehaviour
         }
     }
 
+    //Spawns a snake at its spawn node and setsup its color and otehr needed variables
     private void SpawnSnake(int snakeIndex)
     {
         var node = navVolume.GetNodeFromIndex(spawnCoordinates[snakeIndex]);
@@ -113,6 +117,7 @@ public class SnakeSpawner : MonoBehaviour
         }
     }
 
+    //Creates a new queued respawn when a snake dies if there is not already a respawn queued for it
     private void QueueSnakeRespawn(int snakeIndex)
     {
         var respawnItem = new RespawnItem(snakeIndex, respawnTime);
@@ -128,12 +133,9 @@ public class SnakeSpawner : MonoBehaviour
 
     private class RespawnItem
     {
-        //public Node SpawnNode { get; private set; }
-
-        public int SnakeIndex { get; private set; }
-        public float TimeTilSpawn { get; private set; }
-        //public Color color { get; private set; }
         public float RespawnTime { get; set; }
+        public float TimeTilSpawn { get; private set; }
+        public int SnakeIndex { get; private set; }
         public RespawnItem(int index, float timeTilSpawn)
         {
             SnakeIndex = index;
