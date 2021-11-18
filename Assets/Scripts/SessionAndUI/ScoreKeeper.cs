@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-public class SnakeScoreKeeper : IHeapItem<SnakeScoreKeeper>
+public class ScoreKeeper : IHeapItem<ScoreKeeper>
 {
     public int HeapIndex { get; set; }
     public int Key { get; set; }
@@ -11,7 +11,7 @@ public class SnakeScoreKeeper : IHeapItem<SnakeScoreKeeper>
     public int SnakeIndex { get; private set; }
     public Color SnakeColor { get; private set; }
 
-    public SnakeScoreKeeper(int snakeIndex, Color snakeColor)
+    public ScoreKeeper(int snakeIndex, Color snakeColor)
     {
         SnakeIndex = snakeIndex;
         Key = snakeIndex;
@@ -20,7 +20,7 @@ public class SnakeScoreKeeper : IHeapItem<SnakeScoreKeeper>
         LifeTime = 0f;
     }
 
-    public int CompareTo(SnakeScoreKeeper other)
+    public int CompareTo(ScoreKeeper other)
     {
         var compare = 0;
 

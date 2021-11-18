@@ -13,7 +13,7 @@ public class SnakeHead : SnakeSegment
 
     public int SnakeIndex { get; private set; }
 
-    public SnakeScoreKeeper MyScoreKeeper { get; set; }
+    public ScoreKeeper MyScoreKeeper { get; set; }
 
     [SerializeField] private int StartingSegments = 3;
 

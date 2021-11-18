@@ -82,7 +82,7 @@ public class SnakeSpawner : MonoBehaviour
         ClearRespawns();
         for (int i = 0; i < snakesToSpawn; i++)
         {
-            sessionManager.snakeScores.Add(new SnakeScoreKeeper(i, snakeColors[i]));
+            sessionManager.snakeScores.Add(new ScoreKeeper(i, snakeColors[i]));
 
             SpawnSnake(i);
         }

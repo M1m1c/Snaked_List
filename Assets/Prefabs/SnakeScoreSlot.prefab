@@ -48,7 +48,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1887692226080800367}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e225fd31bc428cd448d90b3df2a016b7, type: 3}
+  m_Script: {fileID: 11500000, guid: 6a676ca79eec80548b47326a124364eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SnakeColorImage: {fileID: 1887692226700025934}

@@ -11,7 +11,7 @@ public class SessionManager : MonoBehaviour
     public static UnityEvent EndSessionEvent = new UnityEvent();
     public static bool isInSession { get; private set; }
 
-    public Heap<SnakeScoreKeeper> snakeScores = new Heap<SnakeScoreKeeper>(8);
+    public Heap<ScoreKeeper> snakeScores = new Heap<ScoreKeeper>(8);
 
     public GameObject SetupUI;
 
@@ -20,11 +20,11 @@ public class SessionManager : MonoBehaviour
     public Text PlayTimerText;
 
     public RectTransform ScoreSlotHolder;
-    public SnakeScoreSlot scoreSlotPrefab;
+    public ScoreSlot scoreSlotPrefab;
 
     private SnakeSpawner snakeSpawner;
 
-    private List<SnakeScoreSlot> snakeScoreSlots = new List<SnakeScoreSlot>();
+    private List<ScoreSlot> snakeScoreSlots = new List<ScoreSlot>();
 
     private float playTimeThreshold = 60f;
     private float sessionTimer = 0f;
@@ -100,7 +100,7 @@ public class SessionManager : MonoBehaviour
             {
                 Destroy(snakeScoreSlots[i].gameObject);
             }
-            snakeScoreSlots = new List<SnakeScoreSlot>();
+            snakeScoreSlots = new List<ScoreSlot>();
         }
     }
 

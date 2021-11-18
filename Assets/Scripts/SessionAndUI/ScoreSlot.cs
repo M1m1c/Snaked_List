@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SnakeScoreSlot : MonoBehaviour
+public class ScoreSlot : MonoBehaviour
 {
     public Image SnakeColorImage;
     public Text SnakeIndexText;
